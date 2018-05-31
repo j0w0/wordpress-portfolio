@@ -50,8 +50,7 @@ $relatedPosts = new WP_Query($args);
 if($relatedPosts->have_posts()) { ?>
     
     <section id="related-tags" class="mb-3">
-        <h3 class="h5-5 text-pink mb-0">Sisters From Different Misters</h3>
-        <p class="small text-muted font-italic">Projects that have different categories, but share a tag.</p>
+        <h3 class="h5-5 text-pink mb-3">Related Tags & Different Category</h3>
         
         <div class="form-row">
             <?php
