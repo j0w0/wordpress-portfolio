@@ -55,14 +55,14 @@ $(document).ready(function() {
                     $("#ajax-spinner").hide();
                     
                     $("#form-return").html(data).fadeIn(function() {
-                        setTimeout(function() {
-                            $("#contact-form")[0].reset();
-                            $("#contact-form").find("#name").removeClass("is-valid");
-                            $("#contact-form").find("#email-address").removeClass("is-valid");
-                            $("#contact-form").find("#message").removeClass("is-valid");
-                            $("#form-return").hide();
-                            $("#contact-form").fadeIn();
-                        }, 3000);
+                        //setTimeout(function() {
+                        //    $("#contact-form")[0].reset();
+                        //    $("#contact-form").find("#name").removeClass("is-valid");
+                        //    $("#contact-form").find("#email-address").removeClass("is-valid");
+                        //    $("#contact-form").find("#message").removeClass("is-valid");
+                        //    $("#form-return").hide();
+                        //    $("#contact-form").fadeIn();
+                        //}, 3000);
                     });
                     
                 }
