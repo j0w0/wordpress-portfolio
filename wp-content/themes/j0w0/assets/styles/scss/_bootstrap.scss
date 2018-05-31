@@ -1,0 +1,43 @@
+@import "../../vendor/bootstrap-4.1.1/scss/functions";
+
+$purple:  #4e0074;
+$pink:    #FF007B;
+$cyan:    #00d9e4;
+
+$colors: (
+    "purple": $purple,
+    "pink": $pink,
+    "cyan": $cyan
+);
+
+$theme-colors: (
+    "primary": $purple,
+    "secondary": $cyan
+);
+
+$enable-rounded: false;
+
+$google-font-1: "Arimo";
+$google-font-2: "Bungee";
+
+$font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
+
+$primary-font-stack: $google-font-1, $font-family-sans-serif;
+$secondary-font-stack: $google-font-2, $font-family-sans-serif;
+
+$font-family-base: $primary-font-stack;
+$headings-font-family: $secondary-font-stack;
+
+$font-weight-normal: 400 !default;
+$font-weight-base: $font-weight-normal !default;
+$headings-font-weight: $font-weight-base;
+
+$display-line-height: 1;
+
+$breadcrumb-margin-bottom: 0;
+
+.btn {
+    font-family: $headings-font-family;
+}
+
+@import "../../vendor/bootstrap-4.1.1/scss/bootstrap.scss";

@@ -1,0 +1,14 @@
+html {
+    font-size: 62.5%;
+}
+
+body {
+    font-size: 1.6rem;
+    line-height: 1.6;
+    font-family: 'Arimo'
+}
+
+p {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}

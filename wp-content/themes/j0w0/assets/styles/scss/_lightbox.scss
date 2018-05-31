@@ -1,0 +1,16 @@
+@import "../../vendor/lightbox2-master/dist/css/lightbox.min.css";
+
+.lb-outerContainer {
+    border-radius: 0;
+}
+
+.lb-data .lb-number {
+    font-size: .75rem;
+    padding: 0;
+}
+
+.lb-data .lb-close {
+    width: 1rem;
+    height: 1rem;
+    background-size: contain;
+}
