@@ -8730,9 +8730,17 @@ h1, h2, h3, h4, h5, h6 {
   background-size: cover;
   background-repeat: no-repeat;
 }
+#hero h1 {
+  font-size: 2.75rem;
+}
+@media (min-width: 576px) {
+  #hero h1 {
+    font-size: 3.5rem;
+  }
+}
 
 .hero-padding {
-  padding: 5.25rem 0 2rem 0;
+  padding: 4.75rem 0 2rem 0;
 }
 @media (min-width: 768px) {
   .hero-padding {
@@ -8798,6 +8806,17 @@ h1, h2, h3, h4, h5, h6 {
 .post-container p {
   font-size: 1.125rem;
 }
+.post-container img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+@media (min-width: 576px) {
+  .post-container img {
+    width: auto;
+    max-width: 100%;
+  }
+}
 
 .slider-bg-image,
 .thumbnail-bg-image {
@@ -8844,13 +8863,33 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .section-padding {
-  padding-top: 3.125rem;
+  padding-top: 2.5rem;
   padding-bottom: 2.5rem;
 }
 @media (min-width: 768px) {
   .section-padding {
     padding-top: 4.5rem;
     padding-bottom: 4.5rem;
+  }
+}
+
+.type-page .section-padding, .post-type-archive .section-padding {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+@media (min-width: 768px) {
+  .type-page .section-padding, .post-type-archive .section-padding {
+    padding-top: 4.5rem;
+    padding-bottom: 4.5rem;
+  }
+}
+.type-page .hero-padding, .post-type-archive .hero-padding {
+  padding-top: 4.75rem;
+  padding-bottom: 1rem;
+}
+@media (min-width: 768px) {
+  .type-page .hero-padding, .post-type-archive .hero-padding {
+    padding: 7rem 0 4rem 0;
   }
 }
 
@@ -8948,6 +8987,16 @@ h1, h2, h3, h4, h5, h6 {
 
 label.is-invalid {
   color: #dc3545;
+}
+
+.alignleft {
+  float: left;
+  margin: 0.25rem 1rem 1rem 0;
+}
+
+.alignright {
+  float: right;
+  margin: 0.25rem 0 1rem 1rem;
 }
 
 /*# sourceMappingURL=css/main.css.map */

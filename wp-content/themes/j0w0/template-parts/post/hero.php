@@ -21,7 +21,7 @@ if($post_type == "portfolio") {
 <header id="hero">
     <div class="hero-padding stripe-pattern bg-secondary">
         <div class="container-fluid container-max-width">
-            <h1 class="display-4 text-primary"><?php the_title(); ?></h1>
+            <h1 class="text-primary"><?php the_title(); ?></h1>
             <?php
             if($post_type == "post") {
                 echo "<p class='publish-data'>";
