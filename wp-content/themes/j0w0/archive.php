@@ -5,7 +5,7 @@
         <header id="hero">
             <div class="hero-padding stripe-pattern bg-secondary">
                 <div class="container-fluid container-max-width">
-                    <h1 class="display-4 text-primary">
+                    <h1 class="text-primary">
                         <?php
                         if(is_post_type_archive()) {
                             post_type_archive_title();
