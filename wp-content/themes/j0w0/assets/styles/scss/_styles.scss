@@ -338,6 +338,17 @@ h1, h2, h3, h4, h5, h6 {
     p {
         font-size: 1.125rem;
     }
+    
+    img {
+        width: 100%;
+        height: auto;
+        display: block;
+        
+        @include media-breakpoint-up(sm) {
+            width: auto;
+            max-width: 100%;
+        }
+    }
 }
 
 .slider-bg-image,
@@ -506,4 +517,25 @@ h1, h2, h3, h4, h5, h6 {
 label.is-invalid {
     color: theme-color("danger");
 }
+
+
+
+
+
+.alignleft {
+    float: left;
+    margin: .25rem 1rem 1rem 0;
+}
+
+.alignright {
+    float: right;
+    margin: .25rem 0 1rem 1rem;
+}
+
+
+
+
+
+
+
     
