@@ -71,9 +71,12 @@ if($post_type == "portfolio") {
     
     <?php
     if($post_type == "portfolio") {
-        $PDFUploadFile = get_post_meta($post->ID, 'portfolio-pdf', true); ?>
-        <a href="<?php echo wp_get_attachment_url($PDFUploadFile); ?>" target="_blank" class="mb-3">View Final PDF of Project &raquo;</a>
-    <?php
+        $PDFUploadFile = get_post_meta($post->ID, 'portfolio-pdf', true);
+        
+        if(!empty($PDFUploadFile)) { ?>
+            <a href="<?php echo wp_get_attachment_url($PDFUploadFile); ?>" target="_blank" class="mb-3">View Final PDF of Project &raquo;</a>
+        <?php
+        }
     }
     ?>
     
