@@ -446,20 +446,31 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 3.125rem;
 }
 
-.portfolio-thumbnail {
-    position: relative;
-    padding-top: 80%;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    margin-bottom: 3rem;
+.portfolio-thumbnail-box {
+    
+    .portfolio-thumbnail {
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        transition: transform .75s;
+    }
+    
+    a:hover {
+        
+        .portfolio-thumbnail {
+            transform: scale(1.5) rotate(15deg);
+            -ms-transform: scale(1.5) rotate(15deg);
+            -webkit-transform: scale(1.5) rotate(15deg);
+        }
+    }
     
     .portfolio-thumbnail-info {
         position: absolute;
+        display: block;
         bottom: -1rem;
-        padding: 0 .625rem;
-        width: 100%;
         text-align: center;
+        left: .9375rem;
+        right: .9375rem;
         
         .portfolio-thumbnail-title {
             position: relative;
@@ -486,9 +497,19 @@ h1, h2, h3, h4, h5, h6 {
     font-size: .875rem;
     line-height: 1.14;
     
+    .thumbnail-bg-image {
+        transition: transform .75s;
+    }
+    
     a:hover {
         text-decoration: none;
         color: color("pink");
+        
+        .thumbnail-bg-image {
+            transform: scale(1.5) rotate(15deg);
+            -ms-transform: scale(1.5) rotate(15deg);
+            -webkit-transform: scale(1.5) rotate(15deg);
+        }
     }
 }
 

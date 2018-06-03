@@ -12,7 +12,7 @@
             <?php get_template_part( 'template-parts/portfolio/items', 'home' ); ?>
             
             <div class="text-center">
-                <a href="<?php echo get_site_url(); ?>/portfolio" class="btn btn-outline-primary btn-lg">View All Work</a>
+                <a href="<?php echo get_site_url(); ?>/portfolio" class="btn btn-outline-primary btn-lg btn-secondary-font">View All Work</a>
             </div>
             
         </div>

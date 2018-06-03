@@ -33,16 +33,18 @@
                                 $projectCategory = $projectCategoryObj[0]->name;
                                 ?>
                                 
-                                <article class="col-sm-6 col-xl-4 mb-3 article">
+                                <article class="col-sm-6 col-xl-4 mb-3 thumbnail-box">
                                     
                                     <header>
                                         <a href="<?php echo the_permalink(); ?>" class="d-block">
-                                            <?php
-                                            if(has_post_thumbnail()) { ?>
-                                                <img src="<?php echo $projectThumbnail; ?>" class="img-responsive mb-2 box-shadow" alt="<?php echo the_title(); ?>" />
-                                            <?php    
-                                            }
-                                            ?>
+                                            <div class="embed-responsive embed-responsive-1by1 mb-2 box-shadow">
+                                                <?php
+                                                if(has_post_thumbnail()) { ?>
+                                                    <div style="background-image: url(<?php echo $projectThumbnail; ?>)" class="embed-responsive-item thumbnail-bg-image mb-2 box-shadow"></div>
+                                                <?php    
+                                                }
+                                                ?>
+                                            </div>
                                             <h1 class="h6 mb-0"><?php echo the_title(); ?></h1>
                                             <p class="small text-muted font-italic mb-3"><?php echo $projectCategory; ?></p>
                                         </a>
