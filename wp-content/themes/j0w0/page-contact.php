@@ -20,6 +20,8 @@
                                     
                                     <?php echo the_content(); ?>
                                     
+                                    <p><a href="<?php echo site_url(); ?>/resume.pdf" target="_blank">View My Resume &raquo;</a></p>
+                                    
                                     <hr />
                                     
                                     <div id="ajax-spinner" style="display: none;"><i class="fas fa-spinner fa-spin fa-lg text-primary"></i></div>
@@ -29,7 +31,7 @@
                                         <div class="form-row">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label for="name">Name <span class="small text-muted">(first and last)</span> <span class="text-danger">*</span></label>
+                                                    <label for="name">First and Last Name <span class="text-danger">*</span></label>
                                                     <input type="text" name="name" id="name" class="form-control" value="" />
                                                 </div>
                                             </div>
@@ -54,7 +56,7 @@
                             </section>
                             
                             <aside id="sidebar" class="col-md-4 offset-md-1">
-                                <?php //get_template_part( 'template-parts/sidebar/contact' ); ?>
+                                <?php get_template_part( 'template-parts/sidebar/contact' ); ?>
                             </aside>
                             
                         </div>

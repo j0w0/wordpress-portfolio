@@ -34,7 +34,9 @@ if($post_type == "portfolio") {
         </div>
         
         <?php
-        if($post_type !== "page") { ?>
+        //if($post_type !== "page") {
+        
+        if($post_type == "post" || $post_type == "portfolio") { ?>
             <div class="post-category-container">
                 <div class="container-fluid container-max-width">
                     <a href="<?php echo $post_cat_link; ?>">

@@ -18,17 +18,18 @@ if($PortfolioPostsQuery->have_posts()) { ?>
             $projectCategory = $projectCategoryObj[0]->name;
             ?>
             
-            <div class="col-12 col-sm-6 col-md-4">
+            <div class="col-12 col-sm-6 col-md-4 portfolio-thumbnail-box mb-5">
                 <a href="<?php the_permalink(); ?>">
-                    <div class="portfolio-thumbnail" style="background-image: url('<?php echo $projectThumbnail; ?>');">
-                        <div class="pattern-overlay stripe-pattern">
-                            <div class="gradient-overlay">
-                                <div class="portfolio-thumbnail-info">
-                                    <span class="portfolio-thumbnail-title"><?php the_title(); ?></span>
-                                    <span class="portfolio-thumbnail-category"><?php echo $projectCategory; ?></span>
-                                </div>
+                    <div class="embed-responsive embed-responsive-1by1 box-shadow">
+                        <div class="portfolio-thumbnail embed-responsive-item" style="background-image: url('<?php echo $projectThumbnail; ?>');">
+                            <div class="pattern-overlay stripe-pattern">
+                                <div class="gradient-overlay"></div>
                             </div>
                         </div>
+                    </div>
+                    <div class="portfolio-thumbnail-info">
+                        <span class="portfolio-thumbnail-title"><?php the_title(); ?></span>
+                        <span class="portfolio-thumbnail-category"><?php echo $projectCategory; ?></span>
                     </div>
                 </a>
             </div>

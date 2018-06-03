@@ -37,6 +37,10 @@ $display-line-height: 1;
 $breadcrumb-margin-bottom: 0;
 
 .btn {
+    font-family: $font-family-base;
+}
+
+.btn-secondary-font {
     font-family: $headings-font-family;
 }
 
