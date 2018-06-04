@@ -11,6 +11,7 @@ $(document).ready(function() {
     $('.slider').bxSlider({
         mode: 'fade',
         auto: true,
+        stopAutoOnClick: true,
         adaptiveHeight: true,
         pause: 5000,
         nextSelector: '.slider-next',
