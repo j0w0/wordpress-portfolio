@@ -70,7 +70,7 @@ function portfolio_columns($columns) {
     );
     return $columns;
 }
-add_filter('manage_edit-portfolio_columns', portfolio_columns);
+add_filter('manage_edit-portfolio_columns', 'portfolio_columns');
 
 // populate admin columns
 function populate_portfolio_columns($column, $post_id) {
