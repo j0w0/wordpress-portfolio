@@ -3,7 +3,7 @@
  * Plugin Name: Dynamic Featured Image
  * Plugin URI: http://wordpress.org/plugins/dynamic-featured-image/
  * Description: Dynamically adds multiple featured image or post thumbnail functionality to your posts, pages and custom post types.
- * Version: 3.6.5
+ * Version: 3.6.8
  * Author: Ankit Pokhrel
  * Author URI: https://ankitpokhrel.com
  * License: GPL2 or later
@@ -49,7 +49,7 @@ class Dynamic_Featured_Image {
      *
      * @since 3.0.0
      */
-    const VERSION = '3.6.5';
+    const VERSION = '3.6.8';
 
     /**
      * Text domain.
@@ -134,6 +134,9 @@ class Dynamic_Featured_Image {
         // media uploader custom fields.
         add_filter( 'attachment_fields_to_edit', array( $this, 'media_attachment_custom_fields' ), 10, 2 );
         add_filter( 'attachment_fields_to_save', array( $this, 'media_attachment_custom_fields_save' ), 10, 2 );
+
+        // plugin sponsors.
+        new PluginSponsor();
 
         // get the site protocol.
         $protocol = $this->get_protocol();
@@ -694,7 +697,7 @@ class Dynamic_Featured_Image {
             // check if the image is edited image.
             // and try to get the attachment id.
             $image_url = str_replace( $this->upload_url . '/', '', $image_url );
-            $row       = $this->execute_query( $this->db->prepare( 'SELECT post_id FROM ' . $this->db->postmeta . ' WHERE meta_value = %s', $image_url ) );
+            $row       = $this->execute_query( $this->db->prepare( 'SELECT post_id FROM ' . $this->db->postmeta . ' WHERE meta_key = %s AND meta_value = %s', '_wp_attached_file', $image_url ) );
 
             if ( ! is_null( $row ) ) {
                 $attachment_id = $row;
@@ -1044,6 +1047,9 @@ class Dynamic_Featured_Image {
         );
     }
 }
+
+// Sponsors who support this plugin.
+include 'sponsors.php';
 
 /**
  * Instantiate the main class.
