@@ -1,12 +1,11 @@
-var $ = jQuery;
+const $ = jQuery;
 
 $(document).ready(function() {
-    
     // mobile menu toggle
-    $("#mobile-menu-button").click(function(){
-        $("#main-menu").slideToggle();
+    $('#mobile-menu-button').click(function() {
+        $('#main-menu').slideToggle();
     });
-    
+
     // portfolio slider
     $('.slider').bxSlider({
         mode: 'fade',
@@ -17,71 +16,76 @@ $(document).ready(function() {
         nextSelector: '.slider-next',
         prevSelector: '.slider-prev',
         nextText: '<i class="fas fa-arrow-right"></i>',
-        prevText: '<i class="fas fa-arrow-left"></i>'
+        prevText: '<i class="fas fa-arrow-left"></i>',
     });
-    
+
     // contact form
-    $("#contact-form").validate({
-        errorClass: "is-invalid",
-        validClass: "is-valid",
+    $('#contact-form').validate({
+        errorClass: 'is-invalid',
+        validClass: 'is-valid',
         rules: {
-            "name": {
+            name: {
                 required: true,
-                minlength: 5
+                minlength: 5,
             },
-            "email-address": {
+            'email-address': {
                 required: true,
                 email: true,
-                minlength: 10
+                minlength: 10,
             },
-            "message": {
+            message: {
                 required: true,
-                minlength: 25
-            }
+                minlength: 25,
+            },
         },
-        submitHandler: function(form) {
-            
-            var formData = $(form).serialize() + "&action=submitContactForm";
-            
+        submitHandler(form) {
+            const formData = `${$(form).serialize()}&action=submitContactForm`;
+
             $.ajax({
+                // eslint-disable-next-line no-undef
                 url: ajax.url,
-                type: "post",
+                type: 'post',
                 data: formData,
-                beforeSend: function() {
-                    $("#contact-form").hide();
-                    $("#ajax-spinner").show();
+                beforeSend() {
+                    $('#contact-form').hide();
+                    $('#ajax-spinner').show();
                 },
-                success: function(data) {
-                    
-                    $("#ajax-spinner").hide();
-                    
-                    $("#form-return").html(data).fadeIn(function() {
-                        setTimeout(function() {
-                            $("#contact-form")[0].reset();
-                            $("#contact-form").find("#name").removeClass("is-valid");
-                            $("#contact-form").find("#email-address").removeClass("is-valid");
-                            $("#contact-form").find("#message").removeClass("is-valid");
-                            $("#form-return").hide();
-                            $("#contact-form").fadeIn();
-                        }, 3000);
-                    });
-                    
-                }
+                success(data) {
+                    $('#ajax-spinner').hide();
+
+                    $('#form-return')
+                        .html(data)
+                        .fadeIn(function() {
+                            setTimeout(function() {
+                                $('#contact-form')[0].reset();
+                                $('#contact-form')
+                                    .find('#name')
+                                    .removeClass('is-valid');
+                                $('#contact-form')
+                                    .find('#email-address')
+                                    .removeClass('is-valid');
+                                $('#contact-form')
+                                    .find('#message')
+                                    .removeClass('is-valid');
+                                $('#form-return').hide();
+                                $('#contact-form').fadeIn();
+                            }, 3000);
+                        });
+                },
             });
-            
-        }
+        },
     });
-    
+
     // parallax scroll
-    var parallax = document.querySelectorAll(".parallax"), speed = 0.5;
+    const parallax = document.querySelectorAll('.parallax');
+    const speed = 0.5;
     window.onscroll = function() {
         [].slice.call(parallax).forEach(function(el) {
-            var windowYOffset = window.pageYOffset,
-            elBackgrounPos = "50% " + (windowYOffset * speed) + "px";
-            elBackgroundColor = "rgba(0,0,0, ." + (windowYOffset * 100) + ")";
+            const windowYOffset = window.pageYOffset;
+            const elBackgrounPos = `50% ${windowYOffset * speed}px`;
+            const elBackgroundColor = `rgba(0,0,0, .${windowYOffset * 100})`;
             el.style.backgroundPosition = elBackgrounPos;
             el.style.backgroundColor = elBackgroundColor;
         });
     };
-    
 });
