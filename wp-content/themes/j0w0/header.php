@@ -16,7 +16,7 @@
                     <img src="<?php echo get_template_directory_uri(); ?>/assets/images/logos/web-logo.svg" alt="Josh Woodcock Creative Design" id="logo-img" />
                     <div id="logo-type">
                         Josh Woodcock<br />
-                        Creative Design
+                        Designer + Developer
                     </div>
                 </a>
                 <div id="mobile-menu-button">
@@ -47,7 +47,7 @@
                         
                         <div id="home-intro" class="text-center">
                             <h1 class="heading-3d-primary">Hello, I&rsquo;m Josh.</h1>
-                            <h2 class="heading-3d-primary">Graphic Designer &  Web Developer</h2>
+                            <h2 class="heading-3d-primary">Front-End Developer + Designer</h2>
                             <a href="<?php echo get_site_url(); ?>/portfolio" class="btn btn-primary btn-lg btn-secondary-font">View My Work</a>
                         </div>
                         
