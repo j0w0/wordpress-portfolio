@@ -3,9 +3,9 @@ Contributors: ankitpokhrel, cfoellmann
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=J9FVY3ESPPD58
 Tags: dynamic featured image, featured image, post thumbnail, dynamic post thumbnail, multiple featured image, multiple post thumbnail
 Requires at least: 3.8
-Tested up to: 4.9.2
-Stable tag: 3.6.8
-Requires PHP: 5.3
+Tested up to: 5.3
+Stable tag: 3.7.0
+Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,20 +22,7 @@ This is especially helpful when you use other plugins, post thumbnails or slider
 Why limit yourself to only one featured image if you can do some awesome stuffs with multiple featured image? 
 DFI allows you to add different number of featured images to each post and page that can be collected by the various theme functions.
 
-> **A NOTE ABOUT SUPPORT:** We’re here to help troubleshoot bugs, but please don't set expectations early as the support forums at WordPress.org are only checked once a week. All the support of the Dynamic Featured Image plugin will now be provided from within [this support forum](https://ankitpokhrel.com/explore/forums/forum/dynamic-featured-image-free-version/ "Dynamic Featured Image Support Forum").
-
-> Users looking for more timely/in-depth support and extended features are encouraged to check out [Dynamic Featured Image PRO](https://ankitpokhrel.com/explore/dynamic-featured-image-pro/ "Dynamic Featured Image PRO").
-
-> **FEATURES OF PRO VERSION**  
-  – Settings Page to control the visibility of DFI metabox.  
-  – Custom title settings to change DFI metabox title as per your need.  
-  – Powerful shortcodes to make your life easier.  
-  – Featured image slider.  
-  – Pro-level support on all forums, including the free forum.  
-  – Dedicated email and chat support.  
-  – Access to more advance features and future updates for free.  
-
-> [Learn more &raquo;](https://ankitpokhrel.com/explore/dynamic-featured-image-pro/ "Dynamic Featured Image PRO")
+> **A NOTE ABOUT SUPPORT:** We’re here to help troubleshoot bugs, but please don't set expectations early as the support forums at WordPress.org are only checked once in a while.
 
 **How it works?**  
 1. After successfull plugin activation go to `add` or `edit` page of posts or pages and you will notice a box for second featured image.  
@@ -117,6 +104,10 @@ Please feel free to report any bug found at https://github.com/ankitpokhrel/Dyna
 3. Add new featured image box.
 
 == Changelog ==
+= 3.7.0 =
+* Feature: Auto-select media on open (#78)
+* Fix: Attachment ID issue for edited image (#77, #80)
+
 = 3.6.8 =
 * Fix slow query issue (#74, Thanks @tobros91)
 * Add German translations (#69, Thanks @swiffer)
@@ -234,6 +225,9 @@ Please feel free to report any bug found at https://github.com/ankitpokhrel/Dyna
 * Fixed some minor issues.
 
 == Upgrade Notice ==
+= 3.7.0 =
+* Autoselect feature and attachment id bug fix.
+
 = 3.6.8 =
 * Some feature and bug fixes.
 
