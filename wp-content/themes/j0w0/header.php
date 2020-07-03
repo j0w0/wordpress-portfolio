@@ -47,7 +47,7 @@
                         
                         <div id="home-intro" class="text-center">
                             <h1 class="heading-3d-primary">Hello, I&rsquo;m Josh.</h1>
-                            <h2 class="heading-3d-primary">Front-End Developer + Designer</h2>
+                            <h2 class="heading-3d-primary">Designer + Front-End Developer</h2>
                             <a href="<?php echo get_site_url(); ?>/portfolio" class="btn btn-primary btn-lg btn-secondary-font">View My Work</a>
                         </div>
                         
