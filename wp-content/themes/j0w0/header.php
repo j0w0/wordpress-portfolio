@@ -13,7 +13,7 @@
             
             <div id="masthead-main">
                 <a id="logo" href="<?php echo get_site_url(); ?>">
-                    <img src="<?php echo get_template_directory_uri(); ?>/assets/images/logos/web-logo.svg" alt="Josh Woodcock Creative Design" id="logo-img" />
+                    <img src="<?php echo get_template_directory_uri(); ?>/assets/images/logos/web-logo.svg" alt="Josh Woodcock, Designer and Developer" id="logo-img" />
                     <div id="logo-type">
                         Josh Woodcock<br />
                         Designer + Developer

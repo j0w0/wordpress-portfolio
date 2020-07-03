@@ -8639,13 +8639,13 @@ h6 {
   margin: 0;
   padding: 0.625rem 0.9375rem 0.9375rem 0.9375rem;
 }
-@media (min-width: 576px) {
+@media (min-width: 768px) {
   #masthead #main-menu ul {
     overflow: hidden;
     padding: 0;
   }
 }
-@media (min-width: 576px) {
+@media (min-width: 768px) {
   #masthead #main-menu ul li {
     float: left;
     margin-left: 0.625rem;
@@ -8654,7 +8654,7 @@ h6 {
 #masthead #main-menu ul li a {
   color: #00d9e4;
 }
-@media (min-width: 576px) {
+@media (min-width: 768px) {
   #masthead #main-menu ul li a {
     color: #fff;
     display: table-cell;
