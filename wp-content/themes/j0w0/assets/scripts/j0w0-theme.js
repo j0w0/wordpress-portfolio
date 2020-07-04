@@ -6,6 +6,14 @@ $(document).ready(function() {
         $('#main-menu').slideToggle();
     });
 
+    // typed
+    const typed = new Typed('#titles', {
+        stringsElement: '#strings-to-type',
+        typeSpeed: 60,
+        backSpeed: 35,
+        loop: true,
+    });
+
     // portfolio slider
     $('.slider').bxSlider({
         mode: 'fade',

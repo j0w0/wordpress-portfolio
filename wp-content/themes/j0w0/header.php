@@ -46,9 +46,14 @@
                     <div class="container-fluid container-max-width">
                         
                         <div id="home-intro" class="text-center">
-                            <h1 class="heading-3d-primary">Hello, I&rsquo;m Josh.</h1>
-                            <h2 class="heading-3d-primary">Designer + Front-End Developer</h2>
-                            <a href="<?php echo get_site_url(); ?>/portfolio" class="btn btn-primary btn-lg btn-secondary-font">View My Work</a>
+                            <h1 class="heading-3d-primary"><span id="hello">Hey, I&rsquo;m Josh</span></h1>
+                            <h2 class="heading-3d-primary"><span id="titles"></span></h2>
+                            <a href="<?php echo get_site_url(); ?>/portfolio" class="btn btn-primary btn-lg btn-secondary-font mt-3">View My Work</a>
+                        </div>
+
+                        <div id="strings-to-type">
+                            <p>Front-End Developer</p>
+                            <p>Visual Designer</p>
                         </div>
                         
                     </div>
