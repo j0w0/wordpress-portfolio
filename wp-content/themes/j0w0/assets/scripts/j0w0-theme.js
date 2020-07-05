@@ -7,12 +7,16 @@ $(document).ready(function() {
     });
 
     // typed
-    const typed = new Typed('#titles', {
-        stringsElement: '#strings-to-type',
-        typeSpeed: 60,
-        backSpeed: 35,
-        loop: true,
-    });
+    const typedPage = document.getElementById('titles');
+
+    if (typedPage !== null) {
+        const typed = new Typed('#titles', {
+            stringsElement: '#strings-to-type',
+            typeSpeed: 60,
+            backSpeed: 35,
+            loop: true,
+        });
+    }
 
     // portfolio slider
     $('.slider').bxSlider({
