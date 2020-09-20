@@ -48,11 +48,15 @@
                         <div id="home-intro" class="text-center">
                             <h1 class="heading-3d-primary"><span id="hello">Hey, I&rsquo;m Josh</span></h1>
                             <h2 class="heading-3d-primary"><span id="titles"></span></h2>
-                            <a href="<?php echo get_site_url(); ?>/portfolio" class="btn btn-primary btn-lg btn-secondary-font mt-3">View My Work</a>
+
+                            <a href="https://github.com/j0w00" target="_blank" class="btn btn-outline-primary btn-lg btn-secondary-font mt-3">Check Out My GitHub</a>
+
+                            <a href="<?php echo get_site_url(); ?>/portfolio" class="btn btn-outline-primary btn-lg btn-secondary-font mt-3">View All My Work</a>
                         </div>
 
                         <div id="strings-to-type">
-                            <p>Front-End Developer</p>
+                            <p>Full Stack Software Engineer</p>
+                            <p>Front End Developer</p>
                             <p>Visual Designer</p>
                         </div>
                         
