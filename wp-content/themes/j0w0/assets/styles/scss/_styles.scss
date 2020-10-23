@@ -499,6 +499,7 @@ h6 {
     text-align: center;
     left: 0.9375rem;
     right: 0.9375rem;
+    padding: 0 0.625rem;
 
     .portfolio-thumbnail-title {
       position: relative;
@@ -517,6 +518,7 @@ h6 {
       color: theme-color("primary");
       background-color: theme-color("secondary");
       font-family: $headings-font-family;
+      font-size: .75rem;
     }
   }
 }

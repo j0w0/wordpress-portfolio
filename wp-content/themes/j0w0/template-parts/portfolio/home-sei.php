@@ -1,24 +1,31 @@
 <?php
-$PortfolioPosts = array(
+$seiPosts = array(
     'post_type' => 'portfolio',
-    'posts_per_page' => 6,
-    'orderby' => 'rand'
+    'posts_per_page' => 4,
+    'tax_query' => array(
+        array(
+            'taxonomy' => 'portfolio-tags',
+            'field' => 'slug',
+            'terms' => 'sei'
+        )
+    ),
+    'orderby' => 'rand',
 );
-$PortfolioPostsQuery = new WP_Query($PortfolioPosts);
+$seiPostsQuery = new WP_Query($seiPosts);
 
-if($PortfolioPostsQuery->have_posts()) { ?>
+if($seiPostsQuery->have_posts()) { ?>
     
     <div class="row">
         
         <?php
-        while($PortfolioPostsQuery->have_posts()) {
-            $PortfolioPostsQuery->the_post();
+        while($seiPostsQuery->have_posts()) {
+            $seiPostsQuery->the_post();
             $projectThumbnail = get_the_post_thumbnail_url($post, 'square-xs');
             $projectCategoryObj = get_the_terms($post->ID, 'portfolio-categories');
             $projectCategory = $projectCategoryObj[0]->name;
             ?>
             
-            <div class="col-12 col-sm-6 col-md-4 portfolio-thumbnail-box mb-5">
+            <div class="col-sm-6 col-lg-3 portfolio-thumbnail-box mb-5">
                 <a href="<?php the_permalink(); ?>">
                     <div class="embed-responsive embed-responsive-1by1 box-shadow">
                         <div class="portfolio-thumbnail embed-responsive-item" style="background-image: url('<?php echo $projectThumbnail; ?>');">

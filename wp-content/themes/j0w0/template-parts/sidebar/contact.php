@@ -1,7 +1,7 @@
 <section id="contact" class="mb-3 p-4">
     <div class="pattern-overlay stripe-pattern pattern-opacity-quarter"></div>
     
-    <h3 class="h5 text-primary mb-3">How may I help you?</h3>
+    <h3 class="h5 text-primary mb-3">Need help? Reach out!</h3>
     
     <?php
     if($pagename !== "contact") { ?>
