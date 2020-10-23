@@ -11,7 +11,7 @@
             
             <?php get_template_part( 'template-parts/portfolio/home', 'sei' ); ?>
 
-            <a href="<?php echo get_site_url(); ?>/portfolio/interactive" class="btn btn-outline-primary btn-secondary-font mt-4">All Dev Projects</a>
+            <a href="<?php echo get_site_url(); ?>/portfolio/category/interactive" class="btn btn-outline-primary btn-secondary-font mt-4">All Dev Projects</a>
             
         </div>
     </section>
