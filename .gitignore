@@ -2,8 +2,6 @@ error_log
 .htaccess
 .DS_Store
 google9ea10346123f3b26.html
-wp-config.php
-
 index.php
 license.txt
 readme.html
@@ -11,6 +9,8 @@ wp-activate.php
 wp-admin/
 wp-blog-header.php
 wp-comments-post.php
+wp-config-sample.php
+wp-config.php
 wp-cron.php
 wp-includes/
 wp-links-opml.php
