@@ -42,7 +42,7 @@
         <?php
         if(is_home() || is_404()) { ?>
             <section id="above-the-fold">
-                <div class="pattern-overlay stripe-pattern">
+                <!-- <div class="pattern-overlay stripe-pattern"> -->
                     <div class="container-fluid container-max-width">
                         
                         <div id="home-intro" class="text-center">
@@ -61,7 +61,7 @@
                         </div>
                         
                     </div>
-                </div>
+                <!-- </div> -->
             </section>
         <?php
         }

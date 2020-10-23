@@ -6,7 +6,7 @@
             <h2 class="heading-3d-primary h1 mb-4">Software Engineering</h2>
 
             <div class="post-container mb-5">
-                <p>I attended a Software Engineering Immersive from July to October 2020 through General Assembly. While I had previously been a self-taught developer and had held a few dev positions up until then, I gained valuable experience through this journey. Learning about and utilizing several programming languages and web frameworks, I developed full-stack applications while applying computer science theories, industry standards, and best practices.</p>
+                <p>I attended a Software Engineering Immersive from July to October 2020 through General Assembly. While I had previously been a self-taught developer and held a few dev positions up until then, I gained valuable experience through this journey. Learning about and utilizing several programming languages and web frameworks, I developed full-stack applications while applying computer science theories, industry standards, and best practices.</p>
             </div>
             
             <?php get_template_part( 'template-parts/portfolio/home', 'sei' ); ?>
@@ -35,7 +35,7 @@
     <section class="section-padding">
         <div class="container-fluid container-max-width">
 
-            <h2 class="heading-3d-primary h1 mb-4">Hello, World!</h2>
+            <h2 class="heading-3d-primary h1 mb-4">Hello, World</h2>
 
             <div class="row">
                 <div class="col-lg-9">
