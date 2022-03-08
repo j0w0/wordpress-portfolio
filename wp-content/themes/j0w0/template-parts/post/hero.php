@@ -10,11 +10,14 @@ if($post_type == "portfolio") {
     $post_links = get_the_term_list($post, 'portfolio-tags', '<ul class="post-tags"><li>', '</li><li>', '</li></ul>');
 } else {
     $categories = get_the_category();
-    $post_cat_obj = $categories[0];
-    $post_cat_name = $post_cat_obj->name;
-    $post_cat_id = $post_cat_obj->term_id;
-    $post_cat_link = get_category_link($post_cat_id);
-    $post_links = get_the_tag_list('<ul class="post-tags"><li>', '</li><li>', '</li></ul>');
+
+    if($categories) {
+        $post_cat_obj = $categories[0];
+        $post_cat_name = $post_cat_obj->name;
+        $post_cat_id = $post_cat_obj->term_id;
+        $post_cat_link = get_category_link($post_cat_id);
+        $post_links = get_the_tag_list('<ul class="post-tags"><li>', '</li><li>', '</li></ul>');
+    }
 }
 ?>
 
@@ -35,7 +38,6 @@ if($post_type == "portfolio") {
         
         <?php
         //if($post_type !== "page") {
-        
         if($post_type == "post" || $post_type == "portfolio") { ?>
             <div class="post-category-container">
                 <div class="container-fluid container-max-width">
@@ -49,6 +51,5 @@ if($post_type == "portfolio") {
         <?php
         }
         ?>
-        
     </div>
 </header>

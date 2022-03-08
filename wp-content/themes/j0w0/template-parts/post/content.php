@@ -1,6 +1,7 @@
 <?php
 $post_type = get_post_type();
 $featured_image_url = get_the_post_thumbnail_url($post, 'full');
+$post_links = null;
 
 if($post_type == "portfolio") {
     $terms = get_the_terms($post, 'portfolio-categories');
@@ -11,18 +12,21 @@ if($post_type == "portfolio") {
     $post_links = get_the_term_list($post, 'portfolio-tags', '<ul class="post-tags"><li>', '</li><li>', '</li></ul>');
 } else {
     $categories = get_the_category();
-    $post_cat_obj = $categories[0];
-    $post_cat_name = $post_cat_obj->name;
-    $post_cat_id = $post_cat_obj->term_id;
-    $post_cat_link = get_category_link($post_cat_id);
-    $post_links = get_the_tag_list('<ul class="post-tags"><li>', '</li><li>', '</li></ul>');
+
+    if($categories) {
+        $post_cat_obj = $categories[0];
+        $post_cat_name = $post_cat_obj->name;
+        $post_cat_id = $post_cat_obj->term_id;
+        $post_cat_link = get_category_link($post_cat_id);
+        $post_links = get_the_tag_list('<ul class="post-tags"><li>', '</li><li>', '</li></ul>');
+    }
 }
 
 
 if($post_type == "portfolio") {
     if( class_exists('Dynamic_Featured_Image') ) {
         global $dynamic_featured_image;
-        $featured_images = $dynamic_featured_image->get_all_featured_images($post_id); ?>
+        $featured_images = $dynamic_featured_image->get_all_featured_images(); ?>
         
         <div class="slider-container">
             
@@ -80,5 +84,5 @@ if($post_type == "portfolio") {
     }
     ?>
     
-    <?php echo $post_links; ?>
+    <?php if($post_links) { echo $post_links; } ?>
 </div>
