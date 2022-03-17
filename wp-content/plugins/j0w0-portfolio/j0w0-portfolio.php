@@ -16,7 +16,10 @@ function register_j0w0_portfolio() {
             'supports' => array( 'title', 'editor', 'thumbnail' ),
             'taxonomies' => array( 'portfolio-categories', 'portfolio-tags' ),
             'has_archive' => true,
-            'register_meta_box_cb' => 'portfolio_metaboxes'
+            'register_meta_box_cb' => 'portfolio_metaboxes',
+            'show_in_graphql' => true,
+            'graphql_single_name' => 'project',
+            'graphql_plural_name' => 'projects'
         )
     );
 };
@@ -35,7 +38,10 @@ function create_portfolio_category_taxonomy() {
             'rewrite' => array(
                 'slug' => 'portfolio/category',
                 'hierarchical' => true
-            )
+            ),
+            'show_in_graphql' => true,
+            'graphql_single_name' => 'projectCategory',
+            'graphql_plural_name' => 'projectCategories'
         )
     );
 }
@@ -53,7 +59,10 @@ function create_portfolio_tags_taxonomy() {
             'hierarchical' => false,
             'rewrite' => array(
                 'slug' => 'portfolio/tag',
-            )
+            ),
+            'show_in_graphql' => true,
+            'graphql_single_name' => 'projectTag',
+            'graphql_plural_name' => 'projectTags'
         )
     );
 }
