@@ -25,6 +25,31 @@ function register_j0w0_portfolio() {
 };
 add_action( 'init', 'register_j0w0_portfolio', 11);
 
+// add custom fields to graphql
+add_action( 'graphql_register_types', function() {
+    register_graphql_field('Project', 'website-url', [
+        'type' => 'string',
+        'resolve' => function( $post ) {
+            $url = get_post_meta( $post->ID, 'website-url', true );
+            return $url ? $url : null;
+        }
+    ]);
+    register_graphql_field('Project', 'video-url', [
+        'type' => 'string',
+        'resolve' => function( $post ) {
+            $url = get_post_meta( $post->ID, 'video-url', true );
+            return $url ? $url : null;
+        }
+    ]);
+    register_graphql_field('Project', 'portfolio-pdf', [
+        'type' => 'string',
+        'resolve' => function( $post ) {
+            $pdf = get_post_meta( $post->ID, 'portfolio-pdf', true );
+            return $pdf ? $pdf : null;
+        }
+    ]);
+});
+
 // creates portfolio category
 function create_portfolio_category_taxonomy() {
     register_taxonomy(
@@ -105,7 +130,6 @@ function portfolio_metaboxes() {
 }
 add_action('add_meta_boxes', 'portfolio_metaboxes');
 
-
 // pdf upload metabox content
 function portfolio_pdf_upload_metabox($post) {
     wp_nonce_field( 'save-portfolio', 'portfolio-nonce' );
@@ -118,7 +142,6 @@ function portfolio_pdf_upload_metabox($post) {
         <input type="file" name="portfolio-pdf" id="portfolio-pdf" value="" style="width: 100%;" />
     <?php
     }
-    
 }
 
 // interactive metabox content
@@ -190,17 +213,4 @@ function save_portfolio_custom_fields($post_id) {
     
 }
 add_action( 'save_post', 'save_portfolio_custom_fields' );
-
-
-
-
-
-
-
-
-
-
-
-
-
 ?>
