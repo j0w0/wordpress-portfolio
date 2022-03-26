@@ -213,4 +213,25 @@ function save_portfolio_custom_fields($post_id) {
     
 }
 add_action( 'save_post', 'save_portfolio_custom_fields' );
+
+// remove p tags from wrapping images in wysiwyg content
+function filter_ptags_on_images($content){
+   return preg_replace('/<p>\s*(<a .*>)?\s*(<img .* \/>)\s*(<\/a>)?\s*<\/p>/iU', '\1\2\3', $content);
+}
+add_filter('the_content', 'filter_ptags_on_images');
+
+// register connection to attached media for wpgraphql
+add_action( 'graphql_register_types', function() {
+	register_graphql_connection([
+		'fromType' => 'ContentNode',
+		'toType' => 'MediaItem',
+		'fromFieldName' => 'attachedMedia',
+		'connectionArgs' => \WPGraphQL\Connection\PostObjects::get_connection_args(),
+		'resolve' => function( \WPGraphQL\Model\Post $source, $args, $context, $info ) {
+			$resolver = new \WPGraphQL\Data\Connection\PostObjectConnectionResolver( $source, $args, $context, $info, 'attachment' );
+			$resolver->set_query_arg( 'post_parent', $source->ID );
+			return $resolver->get_connection();
+		}
+	]);
+} );
 ?>
