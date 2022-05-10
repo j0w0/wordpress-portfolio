@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit36b6f5e40469c15233b7a3c064e28c34
+class ComposerStaticInit4cc131e576717360092436f390448f8b
 {
     public static $files = array (
         'a3ed03db03d57650e139da3e8903943c' => __DIR__ . '/../..' . '/access-functions.php',
@@ -353,6 +353,7 @@ class ComposerStaticInit36b6f5e40469c15233b7a3c064e28c34
         'WPGraphQL\\Type\\Enum\\MenuNodeIdTypeEnum' => __DIR__ . '/../..' . '/src/Type/Enum/MenuNodeIdTypeEnum.php',
         'WPGraphQL\\Type\\Enum\\MimeTypeEnum' => __DIR__ . '/../..' . '/src/Type/Enum/MimeTypeEnum.php',
         'WPGraphQL\\Type\\Enum\\OrderEnum' => __DIR__ . '/../..' . '/src/Type/Enum/OrderEnum.php',
+        'WPGraphQL\\Type\\Enum\\PluginStatusEnum' => __DIR__ . '/../..' . '/src/Type/Enum/PluginStatusEnum.php',
         'WPGraphQL\\Type\\Enum\\PostObjectFieldFormatEnum' => __DIR__ . '/../..' . '/src/Type/Enum/PostObjectFieldFormatEnum.php',
         'WPGraphQL\\Type\\Enum\\PostObjectsConnectionDateColumnEnum' => __DIR__ . '/../..' . '/src/Type/Enum/PostObjectsConnectionDateColumnEnum.php',
         'WPGraphQL\\Type\\Enum\\PostObjectsConnectionOrderbyEnum' => __DIR__ . '/../..' . '/src/Type/Enum/PostObjectsConnectionOrderbyEnum.php',
@@ -441,9 +442,9 @@ class ComposerStaticInit36b6f5e40469c15233b7a3c064e28c34
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit36b6f5e40469c15233b7a3c064e28c34::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit36b6f5e40469c15233b7a3c064e28c34::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit36b6f5e40469c15233b7a3c064e28c34::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit4cc131e576717360092436f390448f8b::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit4cc131e576717360092436f390448f8b::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit4cc131e576717360092436f390448f8b::$classMap;
 
         }, null, ClassLoader::class);
     }
