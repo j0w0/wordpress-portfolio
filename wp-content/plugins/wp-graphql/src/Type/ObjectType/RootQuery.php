@@ -10,9 +10,12 @@ use WPGraphQL\Data\Connection\ContentTypeConnectionResolver;
 use WPGraphQL\Data\Connection\EnqueuedScriptsConnectionResolver;
 use WPGraphQL\Data\Connection\EnqueuedStylesheetConnectionResolver;
 use WPGraphQL\Data\Connection\MenuConnectionResolver;
+use WPGraphQL\Data\Connection\PostObjectConnectionResolver;
 use WPGraphQL\Data\Connection\ThemeConnectionResolver;
 use WPGraphQL\Data\Connection\UserRoleConnectionResolver;
 use WPGraphQL\Data\DataSource;
+use WPGraphQL\Model\Post;
+use WPGraphQL\Type\Connection\PostObjects;
 
 /**
  * Class RootQuery
@@ -33,21 +36,19 @@ class RootQuery {
 				'description' => __( 'The root entry point into the Graph', 'wp-graphql' ),
 				'connections' => [
 					'contentTypes'          => [
-						'toType'               => 'ContentType',
-						'connectionInterfaces' => [ 'ContentTypeConnection' ],
-						'resolve'              => function ( $source, $args, $context, $info ) {
+						'toType'  => 'ContentType',
+						'resolve' => function ( $source, $args, $context, $info ) {
 							$resolver = new ContentTypeConnectionResolver( $source, $args, $context, $info );
 
 							return $resolver->get_connection();
 						},
 					],
 					'menus'                 => [
-						'toType'               => 'Menu',
-						'connectionInterfaces' => [ 'MenuConnection' ],
-						'connectionArgs'       => [
+						'toType'         => 'Menu',
+						'connectionArgs' => [
 							'id'       => [
 								'type'        => 'Int',
-								'description' => __( 'The ID of the object', 'wp-graphql' ),
+								'description' => __( 'The database ID of the object', 'wp-graphql' ),
 							],
 							'location' => [
 								'type'        => 'MenuLocationEnum',
@@ -58,7 +59,7 @@ class RootQuery {
 								'description' => __( 'The slug of the menu to query items for', 'wp-graphql' ),
 							],
 						],
-						'resolve'              => function ( $source, $args, $context, $info ) {
+						'resolve'        => function ( $source, $args, $context, $info ) {
 							$resolver = new MenuConnectionResolver( $source, $args, $context, $info, 'nav_menu' );
 
 							return $resolver->get_connection();
@@ -125,6 +126,16 @@ class RootQuery {
 							return $resolver->get_connection();
 						},
 					],
+					'revisions'             => [
+						'toType'         => 'ContentNode',
+						'queryClass'     => 'WP_Query',
+						'connectionArgs' => PostObjects::get_connection_args(),
+						'resolve'        => function ( $root, $args, $context, $info ) {
+							$resolver = new PostObjectConnectionResolver( $root, $args, $context, $info, 'revision' );
+
+							return $resolver->get_connection();
+						},
+					],
 					'userRoles'             => [
 						'toType'        => 'UserRole',
 						'fromFieldName' => 'userRoles',
@@ -147,17 +158,35 @@ class RootQuery {
 						'type'        => 'Comment',
 						'description' => __( 'Returns a Comment', 'wp-graphql' ),
 						'args'        => [
-							'id' => [
+							'id'     => [
 								'type'        => [
 									'non_null' => 'ID',
 								],
 								'description' => __( 'Unique identifier for the comment node.', 'wp-graphql' ),
 							],
+							'idType' => [
+								'type'        => 'CommentNodeIdTypeEnum',
+								'description' => __( 'Type of unique identifier to fetch a comment by. Default is Global ID', 'wp-graphql' ),
+							],
 						],
 						'resolve'     => function ( $source, array $args, AppContext $context, $info ) {
-							$id_components = Relay::fromGlobalId( $args['id'] );
+							$id_type = isset( $args['idType'] ) ? $args['idType'] : 'id';
 
-							return DataSource::resolve_comment( $id_components['id'], $context );
+							switch ( $id_type ) {
+								case 'database_id':
+									$id = absint( $args['id'] );
+									break;
+								default:
+									$id_components = Relay::fromGlobalId( $args['id'] );
+									if ( ! isset( $id_components['id'] ) || ! absint( $id_components['id'] ) ) {
+										throw new UserError( __( 'The ID input is invalid', 'wp-graphql' ) );
+									}
+									$id = absint( $id_components['id'] );
+
+									break;
+							}
+
+							return $context->get_loader( 'comment' )->load_deferred( $id );
 						},
 					],
 					'contentNode' => [
@@ -185,8 +214,7 @@ class RootQuery {
 						],
 						'resolve'     => function ( $root, $args, AppContext $context, ResolveInfo $info ) {
 
-							$idType  = isset( $args['idType'] ) ? $args['idType'] : 'global_id';
-							$post_id = null;
+							$idType = $args['idType'] ?? 'global_id';
 							switch ( $idType ) {
 								case 'uri':
 									return $context->node_resolver->resolve_uri( $args['id'] );
@@ -220,6 +248,12 @@ class RootQuery {
 
 							return absint( $post_id ) ? $context->get_loader( 'post' )->load_deferred( $post_id )->then(
 								function ( $post ) use ( $allowed_post_types ) {
+
+									// if the post isn't an instance of a Post model, return
+									if ( ! $post instanceof Post ) {
+										return null;
+									}
+
 									if ( ! isset( $post->post_type ) || ! in_array( $post->post_type, $allowed_post_types, true ) ) {
 										return null;
 									}
@@ -347,12 +381,33 @@ class RootQuery {
 								case 'database_id':
 									$id = absint( $args['id'] );
 									break;
+								case 'location':
+									$locations = get_nav_menu_locations();
+
+									if ( ! isset( $locations[ $args['id'] ] ) || ! absint( $locations[ $args['id'] ] ) ) {
+										throw new UserError( __( 'No menu set for the provided location', 'wp-graphql' ) );
+									}
+
+									$id = absint( $locations[ $args['id'] ] );
+									break;
 								case 'name':
 									$menu = new \WP_Term_Query(
 										[
 											'taxonomy' => 'nav_menu',
 											'fields'   => 'ids',
 											'name'     => $args['id'],
+											'include_children' => false,
+											'count'    => false,
+										]
+									);
+									$id   = ! empty( $menu->terms ) ? (int) $menu->terms[0] : null;
+									break;
+								case 'slug':
+									$menu = new \WP_Term_Query(
+										[
+											'taxonomy' => 'nav_menu',
+											'fields'   => 'ids',
+											'slug'     => $args['id'],
 											'include_children' => false,
 											'count'    => false,
 										]
@@ -589,7 +644,7 @@ class RootQuery {
 						'type'        => 'User',
 						'description' => __( 'Returns the current user', 'wp-graphql' ),
 						'resolve'     => function ( $source, array $args, AppContext $context ) {
-							return isset( $context->viewer->ID ) && ! empty( $context->viewer->ID ) ? DataSource::resolve_user( $context->viewer->ID, $context ) : null;
+							return ! empty( $context->viewer->ID ) ? $context->get_loader( 'user' )->load_deferred( $context->viewer->ID ) : null;
 						},
 					],
 				],
@@ -604,7 +659,7 @@ class RootQuery {
 	 */
 	public static function register_post_object_fields() {
 		/** @var \WP_Post_Type[] */
-		$allowed_post_types = \WPGraphQL::get_allowed_post_types( 'objects' );
+		$allowed_post_types = \WPGraphQL::get_allowed_post_types( 'objects', [ 'graphql_register_root_field' => true ] );
 
 		foreach ( $allowed_post_types as $post_type_object ) {
 			register_graphql_field(
@@ -648,7 +703,7 @@ class RootQuery {
 									[
 										'post_type' => $post_type_object->name,
 										'archive'   => false,
-										'nodeType'  => 'Page',
+										'nodeType'  => 'ContentNode',
 									]
 								);
 							case 'database_id':
@@ -656,11 +711,11 @@ class RootQuery {
 								break;
 							case 'source_url':
 								$url     = $args['id'];
-								$post_id = attachment_url_to_postid( $url );
+								$post_id = attachment_url_to_postid( $url ); // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.attachment_url_to_postid_attachment_url_to_postid
 								if ( empty( $post_id ) ) {
 									return null;
 								}
-								$post_id = absint( attachment_url_to_postid( $url ) );
+								$post_id = absint( attachment_url_to_postid( $url ) ); // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.attachment_url_to_postid_attachment_url_to_postid
 								break;
 							case 'global_id':
 							default:
@@ -686,6 +741,12 @@ class RootQuery {
 
 						return absint( $post_id ) ? $context->get_loader( 'post' )->load_deferred( $post_id )->then(
 							function ( $post ) use ( $post_type_object ) {
+
+								// if the post isn't an instance of a Post model, return
+								if ( ! $post instanceof Post ) {
+									return null;
+								}
+
 								if ( ! isset( $post->post_type ) || ! in_array( $post->post_type, [
 									'revision',
 									$post_type_object->name,
@@ -750,7 +811,7 @@ class RootQuery {
 								[
 									'post_type' => $post_type_object->name,
 									'archive'   => false,
-									'nodeType'  => 'Page',
+									'nodeType'  => 'ContentNode',
 								]
 							);
 						} elseif ( ! empty( $args['slug'] ) ) {
@@ -769,7 +830,13 @@ class RootQuery {
 						return $context->get_loader( 'post' )->load_deferred( $post_id )->then(
 							function ( $post ) use ( $post_type_object ) {
 
+								// if the post type object isn't an instance of WP_Post_Type, return
 								if ( ! $post_type_object instanceof \WP_Post_Type ) {
+									return null;
+								}
+
+								// if the post isn't an instance of a Post model, return
+								if ( ! $post instanceof Post ) {
 									return null;
 								}
 
@@ -797,7 +864,7 @@ class RootQuery {
 	 */
 	public static function register_term_object_fields() {
 		/** @var \WP_Taxonomy[] $allowed_taxonomies */
-		$allowed_taxonomies = \WPGraphQL::get_allowed_taxonomies( 'objects' );
+		$allowed_taxonomies = \WPGraphQL::get_allowed_taxonomies( 'objects', [ 'graphql_register_root_field' => true ] );
 
 		foreach ( $allowed_taxonomies as $tax_object ) {
 
@@ -831,7 +898,7 @@ class RootQuery {
 								if ( 'database_id' === $idType ) {
 									$idType = 'id';
 								}
-								$term    = isset( $tax_object->name ) ? get_term_by( $idType, $args['id'], $tax_object->name ) : null;
+								$term    = get_term_by( $idType, $args['id'], $tax_object->name );
 								$term_id = isset( $term->term_id ) ? absint( $term->term_id ) : null;
 								break;
 							case 'uri':

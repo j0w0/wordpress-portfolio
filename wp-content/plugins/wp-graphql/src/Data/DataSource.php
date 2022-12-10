@@ -67,6 +67,8 @@ class DataSource {
 	 * @deprecated Use the Loader passed in $context instead
 	 */
 	public static function resolve_comment( $id, $context ) {
+		_deprecated_function( __METHOD__, '0.8.4', 'Use $context->get_loader( \'comment\' )->load_deferred( $id ) instead.' );
+
 		return $context->get_loader( 'comment' )->load_deferred( $id );
 	}
 
@@ -117,7 +119,6 @@ class DataSource {
 	 */
 	public static function resolve_plugins_connection( $source, array $args, AppContext $context, ResolveInfo $info ) {
 		$resolver = new PluginConnectionResolver( $source, $args, $context, $info );
-
 		return $resolver->get_connection();
 	}
 
@@ -136,6 +137,7 @@ class DataSource {
 	 * @deprecated Use the Loader passed in $context instead
 	 */
 	public static function resolve_post_object( int $id, AppContext $context ) {
+		_deprecated_function( __METHOD__, '0.8.4', 'Use $context->get_loader( \'post\' )->load_deferred( $id ) instead.' );
 		return $context->get_loader( 'post' )->load_deferred( $id );
 	}
 
@@ -149,6 +151,7 @@ class DataSource {
 	 * @deprecated Use the Loader passed in $context instead
 	 */
 	public static function resolve_menu_item( int $id, AppContext $context ) {
+		_deprecated_function( __METHOD__, '0.8.4', 'Use $context->get_loader( \'post\' )->load_deferred( $id ) instead.' );
 		return $context->get_loader( 'post' )->load_deferred( $id );
 	}
 
@@ -216,6 +219,7 @@ class DataSource {
 	 * @deprecated Use the Loader passed in $context instead
 	 */
 	public static function resolve_term_object( $id, AppContext $context ) {
+		_deprecated_function( __METHOD__, '0.8.4', 'Use $context->get_loader( \'term\' )->load_deferred( $id ) instead.' );
 		return $context->get_loader( 'term' )->load_deferred( $id );
 	}
 
@@ -270,7 +274,8 @@ class DataSource {
 	 * @since  0.0.5
 	 */
 	public static function resolve_themes_connection( $source, array $args, AppContext $context, ResolveInfo $info ) {
-		return ThemeConnectionResolver::resolve( $source, $args, $context, $info );
+		$resolver = new ThemeConnectionResolver( $source, $args, $context, $info );
+		return $resolver->get_connection();
 	}
 
 	/**
@@ -286,6 +291,7 @@ class DataSource {
 	 * @deprecated Use the Loader passed in $context instead
 	 */
 	public static function resolve_user( $id, AppContext $context ) {
+		_deprecated_function( __METHOD__, '0.8.4', 'Use $context->get_loader( \'user\' )->load_deferred( $id ) instead.' );
 		return $context->get_loader( 'user' )->load_deferred( $id );
 	}
 
@@ -340,20 +346,19 @@ class DataSource {
 	 * @param int   $user_id ID of the user to get the avatar data for
 	 * @param array $args    The args to pass to the get_avatar_data function
 	 *
-	 * @return array|null|Avatar
+	 * @return Avatar|null
 	 * @throws Exception
 	 */
-	public static function resolve_avatar( $user_id, $args ) {
+	public static function resolve_avatar( int $user_id, array $args ) {
 
 		$avatar = get_avatar_data( absint( $user_id ), $args );
 
-		if ( ! empty( $avatar ) ) {
-			$avatar = new Avatar( $avatar );
-		} else {
-			$avatar = null;
+		// if there's no url returned, return null
+		if ( empty( $avatar['url'] ) ) {
+			return null;
 		}
 
-		return $avatar;
+		return new Avatar( $avatar );
 
 	}
 
@@ -481,6 +486,11 @@ class DataSource {
 		 */
 		$registered_settings = get_registered_settings();
 
+		/**
+		 * Set allowed settings variable.
+		 */
+		$allowed_settings = [];
+
 		if ( ! empty( $registered_settings ) ) {
 
 			/**
@@ -519,7 +529,6 @@ class DataSource {
 		 * @return array
 		 */
 		return apply_filters( 'graphql_allowed_setting_groups', $allowed_settings );
-
 	}
 
 	/**
