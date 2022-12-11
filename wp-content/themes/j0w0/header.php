@@ -16,7 +16,7 @@
                     <img src="<?php echo get_template_directory_uri(); ?>/assets/images/logos/web-logo.svg" alt="Josh Woodcock, Designer and Developer" id="logo-img" />
                     <div id="logo-type">
                         Josh Woodcock<br />
-                        Designer + Developer
+                        Front-End & Full-Stack
                     </div>
                 </a>
                 <div id="mobile-menu-button">
@@ -42,26 +42,20 @@
         <?php
         if(is_home() || is_404()) { ?>
             <section id="above-the-fold">
-                <!-- <div class="pattern-overlay stripe-pattern"> -->
-                    <div class="container-fluid container-max-width">
-                        
-                        <div id="home-intro" class="text-center">
-                            <h1 class="heading-3d-primary"><span id="hello">Hey, I&rsquo;m Josh</span></h1>
-                            <h2 class="heading-3d-primary"><span id="titles"></span></h2>
+                <div class="container-fluid container-max-width">
+                    
+                    <div id="home-intro" class="text-center">
+                        <h1 class="heading-3d-primary"><span id="hello">Hey, I&rsquo;m Josh</span></h1>
+                        <h2 class="heading-3d-primary"><span id="titles"></span></h2>
 
-                            <a href="https://github.com/j0w00" target="_blank" class="btn btn-outline-primary btn-lg btn-secondary-font mt-3">Check Out My GitHub</a>
+                        <a href="https://github.com/j0w00" target="_blank" class="btn btn-outline-primary btn-lg btn-secondary-font mt-3">Check Out My GitHub</a>
 
-                            <a href="<?php echo get_site_url(); ?>/portfolio" class="btn btn-outline-primary btn-lg btn-secondary-font mt-3">View All My Work</a>
-                        </div>
-
-                        <div id="strings-to-type">
-                            <p>Full Stack Software Engineer</p>
-                            <p>Front End Developer</p>
-                            <p>Visual Designer</p>
-                        </div>
-                        
+                        <a href="<?php echo get_site_url(); ?>/portfolio" class="btn btn-outline-primary btn-lg btn-secondary-font mt-3">View All My Work</a>
                     </div>
-                <!-- </div> -->
+
+                    <div id="titles"></div>
+                    
+                </div>
             </section>
         <?php
         }

@@ -3,13 +3,9 @@
     <section class="section-padding">
         <div class="container-fluid container-max-width">
 
-            <h2 class="heading-3d-primary h1 mb-4">Software Engineering</h2>
+            <h2 class="heading-3d-primary h1 mb-4">Web Development</h2>
 
-            <div class="post-container mb-5">
-                <p>I attended a Software Engineering Immersive from July to October 2020 through General Assembly. While I had previously been a self-taught developer and held a few dev positions up until then, I gained valuable experience through this journey. Learning about and utilizing several programming languages and web frameworks, I developed full-stack applications while applying computer science theories, industry standards, and best practices.</p>
-            </div>
-            
-            <?php get_template_part( 'template-parts/portfolio/home', 'sei' ); ?>
+            <?php get_template_part( 'template-parts/portfolio/home', 'web' ); ?>
 
             <a href="<?php echo get_site_url(); ?>/portfolio/category/interactive" class="btn btn-outline-primary btn-secondary-font mt-4">All Dev Projects</a>
             
@@ -19,10 +15,10 @@
     <section class="section-padding bg-light">
         <div class="container-fluid container-max-width">
 
-            <h2 class="heading-3d-primary h1 mb-4">Previous Work</h2>
+            <h2 class="heading-3d-primary h1 mb-4">Early Career</h2>
 
             <div class="post-container mb-5">
-                <p>Before diving into the tech industry and landing my first Front-End Development position, I received my BFA in Communication Design from Texas State University. I then worked in digital marketing creating graphics, emails, websites, and event registration applications. Several of these projects are highlighted below.</p>
+                <p>Although I don't call myself a designer these days, I spent my undergrad years at Texas State University where I received my BFA in Communication Design. I then worked in digital marketing creating graphics, emails, websites, and event registration applications. Several of these projects are highlighted below.</p>
             </div>
 
             <?php get_template_part( 'template-parts/portfolio/home', 'all' ); ?>

@@ -4,9 +4,9 @@ $seiPosts = array(
     'posts_per_page' => 4,
     'tax_query' => array(
         array(
-            'taxonomy' => 'portfolio-tags',
+            'taxonomy' => 'portfolio-categories',
             'field' => 'slug',
-            'terms' => 'sei'
+            'terms' => 'interactive'
         )
     ),
     'orderby' => 'rand',
@@ -16,7 +16,7 @@ $seiPostsQuery = new WP_Query($seiPosts);
 if($seiPostsQuery->have_posts()) { ?>
 
     <div class="post-container mb-5">
-        <p>I attended a Software Engineering Immersive from July to October 2020 through General Assembly. While I had previously been a self-taught developer and held a few dev positions up until then, I gained valuable experience through this journey. Learning about and utilizing several programming languages and web frameworks, I developed full-stack applications while applying computer science theories, industry standards, and best practices.</p>
+        <p>I am a Front-End Developer / Full-Stack Software Engineer experienced in building reliable, manageable, and scalable websites and web applications. I develop quality products by utilizing appropriate technologies and applying best practices for data organization and code optimization. While the projects below are for more visual representation, please make sure to <a href="https://www.github.com/j0w00" target="_blank">check out my GitHub</a> to view my code.</p>
     </div>
     
     <div class="row">

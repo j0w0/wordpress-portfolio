@@ -7,11 +7,16 @@ $(document).ready(function() {
     });
 
     // typed
-    const typedPage = document.getElementById('titles');
-
-    if (typedPage !== null) {
-        const typed = new Typed('#titles', {
-            stringsElement: '#strings-to-type',
+    const typedTitles = document.getElementById('titles');
+    if (typedTitles !== null) {
+        const typed = new Typed(typedTitles, {
+            strings: [
+                'Front-End Developer',
+                'Full-Stack Software Engineer',
+                'Web Developer',
+                'Software Engineer',
+                'Front-End & Full-Stack'
+            ],
             typeSpeed: 60,
             backSpeed: 35,
             loop: true,
