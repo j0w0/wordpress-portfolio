@@ -15,7 +15,7 @@ $(document).ready(function() {
                 'Full-Stack Software Engineer',
                 'Web Developer',
                 'Software Engineer',
-                'Front-End & Full-Stack'
+                'Front-End &amp; Full-Stack'
             ],
             typeSpeed: 60,
             backSpeed: 35,
