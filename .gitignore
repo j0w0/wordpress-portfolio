@@ -23,3 +23,4 @@ wp-trackback.php
 xmlrpc.php
 local-phpinfo.php
 wp-content/mu-plugins/
+local-xdebuginfo.php
