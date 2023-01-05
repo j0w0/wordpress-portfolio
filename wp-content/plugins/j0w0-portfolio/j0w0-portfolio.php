@@ -18,6 +18,7 @@ function register_j0w0_portfolio() {
             'has_archive' => true,
             'register_meta_box_cb' => 'portfolio_metaboxes',
             'show_in_graphql' => true,
+            'show_in_rest' => true,
             'graphql_single_name' => 'project',
             'graphql_plural_name' => 'projects'
         )
@@ -48,6 +49,22 @@ add_action( 'graphql_register_types', function() {
             return $pdf ? $pdf : null;
         }
     ]);
+});
+
+// add custom fields to wp rest api
+add_action( 'rest_api_init', function() {
+    $fields = [ 'portfolio-pdf', 'video-url', 'website-url' ];
+    foreach($fields as $field) {
+        register_rest_field(
+            'portfolio',
+            $field,
+            [
+                'get_callback' => function ($object) use ($field) {
+                    return get_post_meta($object['id'], $field, true);
+                }
+            ]
+        );
+    }
 });
 
 // creates portfolio category
