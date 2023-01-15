@@ -16,7 +16,7 @@ $seiPostsQuery = new WP_Query($seiPosts);
 if($seiPostsQuery->have_posts()) { ?>
 
     <div class="post-container mb-5">
-        <p>I am a Front-End Developer / Full-Stack Software Engineer experienced in building reliable, manageable, and scalable websites and web applications. I develop quality products by utilizing appropriate technologies and applying best practices for data organization and code optimization. While the projects below are for more visual representation, please make sure to <a href="https://www.github.com/j0w00" target="_blank">check out my GitHub</a> to view my code.</p>
+        <p>I am a Front-End Developer / Full-Stack Software Engineer experienced in building reliable, manageable, and scalable websites and web applications. I develop quality products by utilizing appropriate technologies and applying best practices for data organization and code optimization. While the projects below are for more visual representation, please make sure to <a href="https://www.github.com/j0w0" target="_blank">check out my GitHub</a> to view my code.</p>
     </div>
     
     <div class="row">

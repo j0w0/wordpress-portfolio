@@ -48,7 +48,7 @@
                         <h1 class="heading-3d-primary"><span id="hello">Hey, I&rsquo;m Josh</span></h1>
                         <h2 class="heading-3d-primary"><span id="titles"></span></h2>
 
-                        <a href="https://github.com/j0w00" target="_blank" class="btn btn-outline-primary btn-lg btn-secondary-font mt-3">Check Out My GitHub</a>
+                        <a href="https://github.com/j0w0" target="_blank" class="btn btn-outline-primary btn-lg btn-secondary-font mt-3">Check Out My GitHub</a>
 
                         <a href="<?php echo get_site_url(); ?>/portfolio" class="btn btn-outline-primary btn-lg btn-secondary-font mt-3">View All My Work</a>
                     </div>
