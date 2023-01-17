@@ -81,6 +81,7 @@ function create_portfolio_category_taxonomy() {
                 'slug' => 'portfolio/category',
                 'hierarchical' => true
             ),
+            'show_in_rest' => true,
             'show_in_graphql' => true,
             'graphql_single_name' => 'projectCategory',
             'graphql_plural_name' => 'projectCategories'
@@ -102,6 +103,7 @@ function create_portfolio_tags_taxonomy() {
             'rewrite' => array(
                 'slug' => 'portfolio/tag',
             ),
+            'show_in_rest' => true,
             'show_in_graphql' => true,
             'graphql_single_name' => 'projectTag',
             'graphql_plural_name' => 'projectTags'
