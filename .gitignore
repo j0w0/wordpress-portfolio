@@ -23,4 +23,6 @@ wp-trackback.php
 xmlrpc.php
 local-phpinfo.php
 wp-content/mu-plugins/
+wp-content/uploads/
+wp-content/themes/twenty*/
 local-xdebuginfo.php
