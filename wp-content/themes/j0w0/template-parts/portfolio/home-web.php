@@ -33,7 +33,7 @@ if($seiPostsQuery->have_posts()) { ?>
                 <a href="<?php the_permalink(); ?>">
                     <div class="embed-responsive embed-responsive-1by1 box-shadow">
                         <div class="portfolio-thumbnail embed-responsive-item" style="background-image: url('<?php echo $projectThumbnail; ?>');">
-                            <div class="pattern-overlay stripe-pattern">
+                            <div class="pattern-overlay">
                                 <div class="gradient-overlay"></div>
                             </div>
                         </div>
