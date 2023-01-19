@@ -63,7 +63,7 @@ function j0w0_register_graphql_types() {
 			$resolver = new \WPGraphQL\Data\Connection\PostObjectConnectionResolver( $source, $args, $context, $info, 'attachment' );
 
             global $dynamic_featured_image;
-            $featured_images = $dynamic_featured_image->get_all_featured_images();
+            $featured_images = $dynamic_featured_image->get_featured_images();
             $images = [];
 
             foreach($featured_images as $featured_image) {
