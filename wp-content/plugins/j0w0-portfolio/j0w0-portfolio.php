@@ -27,32 +27,59 @@ function register_j0w0_portfolio() {
 add_action( 'init', 'register_j0w0_portfolio', 11);
 
 // add custom fields to graphql
-add_action( 'graphql_register_types', function() {
-    register_graphql_field('Project', 'website-url', [
-        'type' => 'string',
-        'resolve' => function( $post ) {
-            $url = get_post_meta( $post->ID, 'website-url', true );
-            return $url ? $url : null;
-        }
+function j0w0_register_graphql_types() {
+    register_graphql_fields( 'Project', [
+        'websiteUrl' => [
+            'type' => 'String',
+            'resolve' => function( \WPGraphQL\Model\Post $post, $args, $context, $info ) {
+                $url = get_post_meta($post->ID, 'website-url', true);
+                return $url ? $url : null;
+            }
+        ],
+        'videoUrl' => [
+            'type' => 'String',
+            'resolve' => function( \WPGraphQL\Model\Post $post, $args, $context, $info ) {
+                $url = get_post_meta($post->ID, 'video-url', true);
+                return $url ? $url : null;
+            }
+        ],
+        'portfolioPdf' => [
+            'type' => 'String',
+            'resolve' => function( \WPGraphQL\Model\Post $post, $args, $context, $info ) {
+                $url = get_post_meta($post->ID, 'portfolio-pdf', true);
+                return $url ? $url : null;
+            }
+        ],
     ]);
-    register_graphql_field('Project', 'video-url', [
-        'type' => 'string',
-        'resolve' => function( $post ) {
-            $url = get_post_meta( $post->ID, 'video-url', true );
-            return $url ? $url : null;
-        }
-    ]);
-    register_graphql_field('Project', 'portfolio-pdf', [
-        'type' => 'string',
-        'resolve' => function( $post ) {
-            $pdf = get_post_meta( $post->ID, 'portfolio-pdf', true );
-            return $pdf ? $pdf : null;
-        }
-    ]);
-});
+
+    // get attachment/media data for featured images
+    // https://wpgraphql-docs.netlify.app/extending/connections/#register-the-connection
+    register_graphql_connection([
+		'fromType' => 'ContentNode',
+		'toType' => 'MediaItem',
+		'fromFieldName' => 'featuredImages',
+		'connectionArgs' => \WPGraphQL\Connection\PostObjects::get_connection_args(),
+		'resolve' => function( \WPGraphQL\Model\Post $source, $args, $context, $info ) {
+			$resolver = new \WPGraphQL\Data\Connection\PostObjectConnectionResolver( $source, $args, $context, $info, 'attachment' );
+
+            global $dynamic_featured_image;
+            $featured_images = $dynamic_featured_image->get_all_featured_images();
+            $images = [];
+
+            foreach($featured_images as $featured_image) {
+                $attachment_id = $featured_image['attachment_id'];
+                array_push($images, $attachment_id);
+            }
+
+			$resolver->set_query_arg( 'post__in', $images );
+			return $resolver->get_connection();
+		}
+	]);
+}
+add_action('graphql_register_types', 'j0w0_register_graphql_types');
 
 // add custom fields to wp rest api
-add_action( 'rest_api_init', function() {
+function j0w0_add_fields_to_rest_api() {
     $fields = [ 'portfolio-pdf', 'video-url', 'website-url' ];
     foreach($fields as $field) {
         register_rest_field(
@@ -65,7 +92,8 @@ add_action( 'rest_api_init', function() {
             ]
         );
     }
-});
+};
+add_action('rest_api_init', 'j0w0_add_fields_to_rest_api');
 
 // creates portfolio category
 function create_portfolio_category_taxonomy() {
@@ -145,7 +173,6 @@ function portfolio_metaboxes() {
     add_meta_box('interactive-metabox', 'Interactive', 'interactive_metabox', 'portfolio', 'normal', 'default');
     add_meta_box('motion-graphics-metabox', 'Motion Graphics', 'motion_graphics_metabox', 'portfolio', 'normal', 'default');
     add_meta_box('portfolio_pdf_upload_metabox', 'PDF Upload', 'portfolio_pdf_upload_metabox', 'portfolio', 'normal', 'default');
-    // add more metaboxes here
 }
 add_action('add_meta_boxes', 'portfolio_metaboxes');
 
@@ -183,7 +210,6 @@ function motion_graphics_metabox($post) {
 
 // save custom fields
 function save_portfolio_custom_fields($post_id) {
-    
     if(!isset($_POST['portfolio-nonce']) || !wp_verify_nonce($_POST['portfolio-nonce'], 'save-portfolio')) {
         return $post_id;
     }
@@ -229,7 +255,6 @@ function save_portfolio_custom_fields($post_id) {
         wp_delete_attachment($PDFUploadID);
         delete_post_meta($post_id, 'portfolio-pdf');
     }
-    
 }
 add_action( 'save_post', 'save_portfolio_custom_fields' );
 
@@ -238,19 +263,3 @@ function filter_ptags_on_images($content){
    return preg_replace('/<p>\s*(<a .*>)?\s*(<img .* \/>)\s*(<\/a>)?\s*<\/p>/iU', '\1\2\3', $content);
 }
 add_filter('the_content', 'filter_ptags_on_images');
-
-// register connection to attached media for wpgraphql
-add_action( 'graphql_register_types', function() {
-	register_graphql_connection([
-		'fromType' => 'ContentNode',
-		'toType' => 'MediaItem',
-		'fromFieldName' => 'attachedMedia',
-		'connectionArgs' => \WPGraphQL\Connection\PostObjects::get_connection_args(),
-		'resolve' => function( \WPGraphQL\Model\Post $source, $args, $context, $info ) {
-			$resolver = new \WPGraphQL\Data\Connection\PostObjectConnectionResolver( $source, $args, $context, $info, 'attachment' );
-			$resolver->set_query_arg( 'post_parent', $source->ID );
-			return $resolver->get_connection();
-		}
-	]);
-} );
-?>
