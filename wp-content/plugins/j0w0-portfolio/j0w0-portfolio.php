@@ -79,7 +79,7 @@ function j0w0_register_graphql_types() {
     // get randomly ordered interactive portfolio posts
     register_graphql_connection([
         'fromType' => 'RootQuery',
-		'toType' => 'Post',
+		'toType' => 'project',
 		'fromFieldName' => 'projectsRandom',
 		'resolve' => function( $id, $args, $context, $info ) {
 			$resolver = new \WPGraphQL\Data\Connection\PostObjectConnectionResolver( $source, $args, $context,  $info, 'portfolio' );
