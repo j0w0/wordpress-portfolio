@@ -75,6 +75,25 @@ function j0w0_register_graphql_types() {
 			return $resolver->get_connection();
 		}
 	]);
+
+    // get randomly ordered interactive portfolio posts
+    register_graphql_connection([
+        'fromType' => 'RootQuery',
+		'toType' => 'Post',
+		'fromFieldName' => 'projectsRandom',
+		'resolve' => function( $id, $args, $context, $info ) {
+			$resolver = new \WPGraphQL\Data\Connection\PostObjectConnectionResolver( $source, $args, $context,  $info, 'portfolio' );
+
+            $resolver->set_query_arg( 'tax_query', [[
+                'taxonomy' => 'portfolio-categories',
+                'field'    => 'slug',
+                'terms'    => 'interactive',
+            ]]);
+
+			$resolver->set_query_arg( 'orderby', 'rand' );
+			return $resolver->get_connection();
+		}
+    ]);
 }
 add_action('graphql_register_types', 'j0w0_register_graphql_types');
 
