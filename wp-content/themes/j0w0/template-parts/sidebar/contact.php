@@ -10,6 +10,6 @@
     }
     ?>
     
-    <a href="<?php echo site_url(); ?>/resume.pdf" target="_blank" class="btn btn-primary d-block d-sm-inline-block mb-2">View My Resume</a>
+    <a href="https://resume.j0w0.com" target="_blank" class="btn btn-primary d-block d-sm-inline-block mb-2">View My Resume</a>
     
 </section>

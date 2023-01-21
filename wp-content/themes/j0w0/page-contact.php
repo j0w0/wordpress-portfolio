@@ -20,7 +20,7 @@
                                     
                                     <?php echo the_content(); ?>
                                     
-                                    <p><a href="<?php echo site_url(); ?>/resume.pdf" target="_blank">View My Resume &raquo;</a></p>
+                                    <p><a href="https://resume.j0w0.com" target="_blank">View My Resume &raquo;</a></p>
                                     
                                     <hr />
                                     
