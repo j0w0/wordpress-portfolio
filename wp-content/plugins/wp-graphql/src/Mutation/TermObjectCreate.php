@@ -4,9 +4,9 @@ namespace WPGraphQL\Mutation;
 
 use GraphQL\Error\UserError;
 use GraphQL\Type\Definition\ResolveInfo;
-use WP_Taxonomy;
 use WPGraphQL\AppContext;
 use WPGraphQL\Data\TermObjectMutation;
+use WP_Taxonomy;
 
 class TermObjectCreate {
 	/**
@@ -45,7 +45,7 @@ class TermObjectCreate {
 	 *
 	 * @param \WP_Taxonomy $taxonomy The taxonomy type of the mutation.
 	 *
-	 * @return array
+	 * @return array<string,array<string,mixed>>
 	 */
 	public static function get_input_fields( WP_Taxonomy $taxonomy ) {
 		$fields = [
@@ -84,7 +84,7 @@ class TermObjectCreate {
 	 *
 	 * @param \WP_Taxonomy $taxonomy The taxonomy type of the mutation.
 	 *
-	 * @return array
+	 * @return array<string,array<string,mixed>>
 	 */
 	public static function get_output_fields( WP_Taxonomy $taxonomy ) {
 		return [
@@ -92,11 +92,10 @@ class TermObjectCreate {
 				'type'        => $taxonomy->graphql_single_name,
 				// translators: Placeholder is the name of the taxonomy
 				'description' => sprintf( __( 'The created %s', 'wp-graphql' ), $taxonomy->name ),
-				'resolve'     => static function ( $payload, $args, AppContext $context, ResolveInfo $info ) {
+				'resolve'     => static function ( $payload, $_args, AppContext $context ) {
 					$id = isset( $payload['termId'] ) ? absint( $payload['termId'] ) : null;
 
 					return $context->get_loader( 'term' )->load_deferred( $id );
-
 				},
 			],
 		];
@@ -106,7 +105,7 @@ class TermObjectCreate {
 	 * Defines the mutation data modification closure.
 	 *
 	 * @param \WP_Taxonomy $taxonomy The taxonomy type of the mutation.
-	 * @param string      $mutation_name The name of the mutation.
+	 * @param string       $mutation_name The name of the mutation.
 	 *
 	 * @return callable
 	 */
@@ -118,7 +117,7 @@ class TermObjectCreate {
 			 */
 			if ( ! isset( $taxonomy->cap->edit_terms ) || ! current_user_can( $taxonomy->cap->edit_terms ) ) {
 				// translators: the $taxonomy->graphql_plural_name placeholder is the name of the object being mutated
-				throw new UserError( sprintf( __( 'Sorry, you are not allowed to create %1$s', 'wp-graphql' ), $taxonomy->graphql_plural_name ) );
+				throw new UserError( esc_html( sprintf( __( 'Sorry, you are not allowed to create %1$s', 'wp-graphql' ), $taxonomy->graphql_plural_name ) ) );
 			}
 
 			/**
@@ -131,14 +130,14 @@ class TermObjectCreate {
 			 */
 			if ( empty( $args['name'] ) ) {
 				// translators: The placeholder is the name of the taxonomy of the term being mutated
-				throw new UserError( sprintf( __( 'A name is required to create a %1$s', 'wp-graphql' ), $taxonomy->name ) );
+				throw new UserError( esc_html( sprintf( __( 'A name is required to create a %1$s', 'wp-graphql' ), $taxonomy->name ) ) );
 			}
 
 			$term_name = wp_slash( $args['name'] );
 
 			if ( ! is_string( $term_name ) ) {
 				// translators: The placeholder is the name of the taxonomy of the term being mutated
-				throw new UserError( sprintf( __( 'A valid name is required to create a %1$s', 'wp-graphql' ), $taxonomy->name ) );
+				throw new UserError( esc_html( sprintf( __( 'A valid name is required to create a %1$s', 'wp-graphql' ), $taxonomy->name ) ) );
 			}
 
 			/**
@@ -154,7 +153,7 @@ class TermObjectCreate {
 				if ( ! empty( $error_message ) ) {
 					throw new UserError( esc_html( $error_message ) );
 				} else {
-					throw new UserError( __( 'The object failed to update but no error was provided', 'wp-graphql' ) );
+					throw new UserError( esc_html__( 'The object failed to update but no error was provided', 'wp-graphql' ) );
 				}
 			}
 
@@ -162,7 +161,7 @@ class TermObjectCreate {
 			 * If the response to creating the term didn't respond with a term_id, throw an exception
 			 */
 			if ( empty( $term['term_id'] ) ) {
-				throw new UserError( __( 'The object failed to create', 'wp-graphql' ) );
+				throw new UserError( esc_html__( 'The object failed to create', 'wp-graphql' ) );
 			}
 
 			/**

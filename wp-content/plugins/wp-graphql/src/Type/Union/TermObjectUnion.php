@@ -1,7 +1,6 @@
 <?php
 namespace WPGraphQL\Type\Union;
 
-use Exception;
 use WPGraphQL\Registry\TypeRegistry;
 
 /**
@@ -17,7 +16,6 @@ class TermObjectUnion {
 	 *
 	 * @param \WPGraphQL\Registry\TypeRegistry $type_registry
 	 *
-	 * @return void
 	 * @throws \Exception
 	 */
 	public static function register_type( TypeRegistry $type_registry ): void {
@@ -39,7 +37,6 @@ class TermObjectUnion {
 					}
 
 					return ! empty( $type ) ? $type : null;
-
 				},
 			]
 		);
@@ -48,7 +45,7 @@ class TermObjectUnion {
 	/**
 	 * Returns a list of possible types for the union
 	 *
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public static function get_possible_types() {
 		$possible_types = [];

@@ -4,9 +4,9 @@ namespace WPGraphQL\Mutation;
 
 use GraphQL\Error\UserError;
 use GraphQLRelay\Relay;
-use WP_Taxonomy;
 use WPGraphQL\Model\Term;
 use WPGraphQL\Utils\Utils;
+use WP_Taxonomy;
 
 /**
  * Class TermObjectDelete
@@ -39,7 +39,7 @@ class TermObjectDelete {
 	 *
 	 * @param \WP_Taxonomy $taxonomy The taxonomy type of the mutation.
 	 *
-	 * @return array
+	 * @return array<string,array<string,mixed>>
 	 */
 	public static function get_input_fields( WP_Taxonomy $taxonomy ) {
 		return [
@@ -58,7 +58,7 @@ class TermObjectDelete {
 	 *
 	 * @param \WP_Taxonomy $taxonomy The taxonomy type of the mutation.
 	 *
-	 * @return array
+	 * @return array<string,array<string,mixed>>
 	 */
 	public static function get_output_fields( WP_Taxonomy $taxonomy ) {
 		return [
@@ -73,7 +73,7 @@ class TermObjectDelete {
 			],
 			$taxonomy->graphql_single_name => [
 				'type'        => $taxonomy->graphql_single_name,
-				'description' => __( 'The deteted term object', 'wp-graphql' ),
+				'description' => __( 'The deleted term object', 'wp-graphql' ),
 				'resolve'     => static function ( $payload ) {
 					return new Term( $payload['termObject'] );
 				},
@@ -85,7 +85,7 @@ class TermObjectDelete {
 	 * Defines the mutation data modification closure.
 	 *
 	 * @param \WP_Taxonomy $taxonomy The taxonomy type of the mutation.
-	 * @param string      $mutation_name The name of the mutation.
+	 * @param string       $mutation_name The name of the mutation.
 	 *
 	 * @return callable
 	 */
@@ -96,7 +96,7 @@ class TermObjectDelete {
 
 			if ( empty( $term_id ) ) {
 				// Translators: The placeholder is the name of the taxonomy for the term being deleted
-				throw new UserError( sprintf( __( 'The ID for the %1$s was not valid', 'wp-graphql' ), $taxonomy->graphql_single_name ) );
+				throw new UserError( esc_html( sprintf( __( 'The ID for the %1$s was not valid', 'wp-graphql' ), $taxonomy->graphql_single_name ) ) );
 			}
 
 			/**
@@ -105,7 +105,7 @@ class TermObjectDelete {
 			$term_object = get_term( $term_id, $taxonomy->name );
 
 			if ( ! $term_object instanceof \WP_Term ) {
-				throw new UserError( __( 'The ID passed is invalid', 'wp-graphql' ) );
+				throw new UserError( esc_html__( 'The ID passed is invalid', 'wp-graphql' ) );
 			}
 
 			/**
@@ -113,7 +113,7 @@ class TermObjectDelete {
 			 */
 			if ( $taxonomy->name !== $term_object->taxonomy ) {
 				// Translators: The placeholder is the name of the taxonomy for the term being edited
-				throw new UserError( sprintf( __( 'The ID passed is not for a %1$s object', 'wp-graphql' ), $taxonomy->graphql_single_name ) );
+				throw new UserError( esc_html( sprintf( __( 'The ID passed is not for a %1$s object', 'wp-graphql' ), $taxonomy->graphql_single_name ) ) );
 			}
 
 			/**
@@ -121,7 +121,7 @@ class TermObjectDelete {
 			 */
 			if ( ! current_user_can( 'delete_term', $term_object->term_id ) ) {
 				// Translators: The placeholder is the name of the taxonomy for the term being deleted
-				throw new UserError( sprintf( __( 'You do not have permission to delete %1$s', 'wp-graphql' ), $taxonomy->graphql_plural_name ) );
+				throw new UserError( esc_html( sprintf( __( 'You do not have permission to delete %1$s', 'wp-graphql' ), $taxonomy->graphql_plural_name ) ) );
 			}
 
 			/**
@@ -138,7 +138,7 @@ class TermObjectDelete {
 					throw new UserError( esc_html( $error_message ) );
 				} else {
 					// Translators: The placeholder is the name of the taxonomy for the term being deleted
-					throw new UserError( sprintf( __( 'The %1$s failed to delete but no error was provided', 'wp-graphql' ), $taxonomy->name ) );
+					throw new UserError( esc_html( sprintf( __( 'The %1$s failed to delete but no error was provided', 'wp-graphql' ), $taxonomy->name ) ) );
 				}
 			}
 

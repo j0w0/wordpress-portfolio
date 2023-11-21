@@ -22,6 +22,8 @@ use function sprintf;
 class QueryDepth extends QuerySecurityRule {
 
 	/**
+	 * The max query depth allowed.
+	 *
 	 * @var int
 	 */
 	private $maxQueryDepth;
@@ -36,9 +38,11 @@ class QueryDepth extends QuerySecurityRule {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 *
 	 * @param \GraphQL\Validator\ValidationContext $context
 	 *
-	 * @return callable[]|mixed[]
+	 * @return callable[]
 	 */
 	public function getVisitor( ValidationContext $context ) {
 		return $this->invokeIfNeeded(
@@ -46,7 +50,7 @@ class QueryDepth extends QuerySecurityRule {
 			// @phpstan-ignore-next-line
 			[
 				NodeKind::OPERATION_DEFINITION => [
-					'leave' => function ( OperationDefinitionNode $operationDefinition ) use ( $context ) : void {
+					'leave' => function ( OperationDefinitionNode $operationDefinition ) use ( $context ): void {
 						$maxDepth = $this->fieldDepth( $operationDefinition );
 
 						if ( $maxDepth <= $this->getMaxQueryDepth() ) {
@@ -66,8 +70,8 @@ class QueryDepth extends QuerySecurityRule {
 	 * Determine field depth
 	 *
 	 * @param mixed $node The node being analyzed
-	 * @param int $depth The depth of the field
-	 * @param int $maxDepth The max depth allowed
+	 * @param int   $depth The depth of the field
+	 * @param int   $maxDepth The max depth allowed
 	 *
 	 * @return int|mixed
 	 */
@@ -85,8 +89,8 @@ class QueryDepth extends QuerySecurityRule {
 	 * Determine node depth
 	 *
 	 * @param \GraphQL\Language\AST\Node $node The node being analyzed in the operation
-	 * @param int  $depth The depth of the operation
-	 * @param int  $maxDepth The Max Depth of the operation
+	 * @param int                        $depth The depth of the operation
+	 * @param int                        $maxDepth The Max Depth of the operation
 	 *
 	 * @return int|mixed
 	 */
@@ -160,7 +164,6 @@ class QueryDepth extends QuerySecurityRule {
 	 * @return bool
 	 */
 	protected function isEnabled() {
-
 		$is_enabled = false;
 
 		$enabled = get_graphql_setting( 'query_depth_enabled', 'off' );
@@ -170,6 +173,5 @@ class QueryDepth extends QuerySecurityRule {
 		}
 
 		return $is_enabled;
-
 	}
 }
