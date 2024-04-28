@@ -91,7 +91,7 @@ class WPConnectionType {
 	/**
 	 * The resolver function to resolve the connection
 	 *
-	 * @var callable|\Closure
+	 * @var callable(mixed $root,array<string,mixed> $args,\WPGraphQL\AppContext $context,\GraphQL\Type\Definition\ResolveInfo $info):mixed
 	 */
 	protected $resolve_connection;
 
@@ -142,7 +142,7 @@ class WPConnectionType {
 		/**
 		 * Filter the config of WPConnectionType
 		 *
-		 * @param array        $config         Array of configuration options passed to the WPConnectionType when instantiating a new type
+		 * @param array<string,mixed>              $config             Array of configuration options passed to the WPConnectionType when instantiating a new type
 		 * @param \WPGraphQL\Type\WPConnectionType $wp_connection_type The instance of the WPConnectionType class
 		 */
 		$config = apply_filters( 'graphql_wp_connection_type_config', $config, $this );
@@ -188,7 +188,7 @@ class WPConnectionType {
 		/**
 		 * Run an action when the WPConnectionType is instantiating.
 		 *
-		 * @param array        $config         Array of configuration options passed to the WPObjectType when instantiating a new type
+		 * @param array<string,mixed>              $config             Array of configuration options passed to the WPObjectType when instantiating a new type
 		 * @param \WPGraphQL\Type\WPConnectionType $wp_connection_type The instance of the WPConnectionType class
 		 *
 		 * @since 1.13.0
@@ -515,6 +515,7 @@ class WPConnectionType {
 				'type'                  => true === $this->one_to_one ? $this->connection_name . 'Edge' : $this->connection_name,
 				'args'                  => array_merge( $this->get_pagination_args(), $this->where_args ),
 				'auth'                  => $this->auth,
+				'isConnectionField'     => true,
 				'deprecationReason'     => ! empty( $this->config['deprecationReason'] ) ? $this->config['deprecationReason'] : null,
 				'description'           => ! empty( $this->config['description'] )
 					? $this->config['description']
@@ -561,7 +562,6 @@ class WPConnectionType {
 				]
 			);
 		}
-
 
 		if ( ! $this->type_registry->has_type( $connection_edge_type ) ) {
 			$this->type_registry->register_interface_type(

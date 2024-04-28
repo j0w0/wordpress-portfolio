@@ -95,7 +95,7 @@ abstract class AbstractDataLoader {
 					static::class . '::buffer expects all keys to be scalars, but key ' .
 					'at position ' . esc_html( $index ) . ' is ' . esc_html(
 						Utils::printSafe( $keys ) . '. ' .
-						$this->get_scalar_key_hint( $key ) 
+						$this->get_scalar_key_hint( $key )
 					)
 				);
 			}
@@ -109,9 +109,9 @@ abstract class AbstractDataLoader {
 	 * Loads a key and returns value represented by this key.
 	 * Internally this method will load all currently buffered items and cache them locally.
 	 *
-	 * @param mixed $key
+	 * @param int|string|mixed $key
 	 *
-	 * @return mixed
+	 * @return ?\WPGraphQL\Model\Model
 	 * @throws \Exception
 	 */
 	public function load( $key ) {
@@ -120,7 +120,7 @@ abstract class AbstractDataLoader {
 			throw new Exception(
 				static::class . '::load expects key to be scalar, but got ' . esc_html(
 					Utils::printSafe( $key ) .
-					$this->get_scalar_key_hint( $key ) 
+					$this->get_scalar_key_hint( $key )
 				)
 			);
 		}
@@ -150,7 +150,7 @@ abstract class AbstractDataLoader {
 			throw new Exception(
 				static::class . '::prime is expecting scalar $key, but got ' . esc_html(
 					Utils::printSafe( $key )
-					. $this->get_scalar_key_hint( $key ) 
+					. $this->get_scalar_key_hint( $key )
 				)
 			);
 		}
@@ -418,7 +418,7 @@ abstract class AbstractDataLoader {
 	/**
 	 * Returns a cached data object by key.
 	 *
-	 * @param mixed $key  Key.
+	 * @param int|string $key Key.
 	 *
 	 * @return mixed
 	 */
@@ -431,10 +431,10 @@ abstract class AbstractDataLoader {
 		/**
 		 * Use this filter to retrieving cached data objects from third-party caching system.
 		 *
-		 * @param mixed  $value         Value to be cached.
-		 * @param mixed  $key           Key identifying object.
-		 * @param string $loader_class  Loader class name.
-		 * @param mixed  $loader        Loader instance.
+		 * @param mixed       $value        Value to be cached.
+		 * @param int|string  $key          Key identifying object.
+		 * @param string      $loader_class Loader class name.
+		 * @param mixed       $loader       Loader instance.
 		 */
 		$value = apply_filters(
 			'graphql_dataloader_get_cached',

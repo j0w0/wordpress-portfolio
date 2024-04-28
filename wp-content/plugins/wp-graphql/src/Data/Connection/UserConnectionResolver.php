@@ -23,14 +23,7 @@ class UserConnectionResolver extends AbstractConnectionResolver {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function should_execute() {
-		return true;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function get_loader_name() {
+	protected function loader_name(): string {
 		return 'user';
 	}
 
@@ -185,7 +178,7 @@ class UserConnectionResolver extends AbstractConnectionResolver {
 	}
 
 	/**
-	 * Return an instance of the WP_User_Query with the args for the connection being executed
+	 * {@inheritDoc}
 	 *
 	 * @return object|\WP_User_Query
 	 * @throws \Exception
@@ -266,14 +259,13 @@ class UserConnectionResolver extends AbstractConnectionResolver {
 		 * This allows plugins/themes to hook in and alter what $args should be allowed to be passed
 		 * from a GraphQL Query to the WP_User_Query
 		 *
-		 * @param array       $query_args The mapped query args
-		 * @param array       $args       The query "where" args
-		 * @param mixed       $source     The query results of the query calling this relation
-		 * @param array       $all_args   Array of all the query args (not just the "where" args)
-		 * @param \WPGraphQL\AppContext $context The AppContext object
+		 * @param array<string,mixed>                  $query_args The mapped query args
+		 * @param array<string,mixed>                  $args       The query "where" args
+		 * @param mixed                                $source     The query results of the query calling this relation
+		 * @param array<string,mixed>                  $all_args   Array of all the query args (not just the "where" args)
+		 * @param \WPGraphQL\AppContext                $context The AppContext object
 		 * @param \GraphQL\Type\Definition\ResolveInfo $info The ResolveInfo object
 		 *
-		 * @return array
 		 * @since 0.0.5
 		 */
 		$query_args = apply_filters( 'graphql_map_input_fields_to_wp_user_query', $query_args, $args, $this->source, $this->args, $this->context, $this->info );
@@ -284,11 +276,16 @@ class UserConnectionResolver extends AbstractConnectionResolver {
 	/**
 	 * {@inheritDoc}
 	 *
-	 * @param int $offset The ID of the node used as the offset in the cursor
-	 *
-	 * @return bool
+	 * @param int $offset The ID of the node used as the offset in the cursor.
 	 */
 	public function is_valid_offset( $offset ) {
 		return (bool) get_user_by( 'ID', absint( $offset ) );
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function should_execute() {
+		return true;
 	}
 }

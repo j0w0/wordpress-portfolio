@@ -52,7 +52,6 @@ class TermObjectConnectionResolver extends AbstractConnectionResolver {
 			$taxonomy             = array_intersect( $all_taxonomies, $requested_taxonomies );
 		}
 
-
 		$query_args = [
 			'taxonomy' => $taxonomy,
 		];
@@ -60,8 +59,7 @@ class TermObjectConnectionResolver extends AbstractConnectionResolver {
 		/**
 		 * Prepare for later use
 		 */
-		$last  = ! empty( $this->args['last'] ) ? $this->args['last'] : null;
-		$first = ! empty( $this->args['first'] ) ? $this->args['first'] : null;
+		$last = ! empty( $this->args['last'] ) ? $this->args['last'] : null;
 
 		/**
 		 * Set hide_empty as false by default
@@ -71,7 +69,7 @@ class TermObjectConnectionResolver extends AbstractConnectionResolver {
 		/**
 		 * Set the number, ensuring it doesn't exceed the amount set as the $max_query_amount
 		 */
-		$query_args['number'] = min( max( absint( $first ), absint( $last ), 10 ), $this->query_amount ) + 1;
+		$query_args['number'] = $this->get_query_amount() + 1;
 
 		/**
 		 * Don't calculate the total rows, it's not needed and can be expensive
@@ -134,11 +132,11 @@ class TermObjectConnectionResolver extends AbstractConnectionResolver {
 		 * Filter the query_args that should be applied to the query. This filter is applied AFTER the input args from
 		 * the GraphQL Query have been applied and has the potential to override the GraphQL Query Input Args.
 		 *
-		 * @param array       $query_args array of query_args being passed to the
-		 * @param mixed       $source     source passed down from the resolve tree
-		 * @param array       $args       array of arguments input in the field as part of the GraphQL query
-		 * @param \WPGraphQL\AppContext $context object passed down the resolve tree
-		 * @param \GraphQL\Type\Definition\ResolveInfo $info info about fields passed down the resolve tree
+		 * @param array<string,mixed>                  $query_args array of query_args being passed to the
+		 * @param mixed                                $source     source passed down from the resolve tree
+		 * @param array<string,mixed>                  $args       array of arguments input in the field as part of the GraphQL query
+		 * @param \WPGraphQL\AppContext                $context    object passed down the resolve tree
+		 * @param \GraphQL\Type\Definition\ResolveInfo $info       info about fields passed down the resolve tree
 		 *
 		 * @since 0.0.6
 		 */
@@ -175,17 +173,8 @@ class TermObjectConnectionResolver extends AbstractConnectionResolver {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function get_loader_name() {
+	protected function loader_name(): string {
 		return 'term';
-	}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * Default is true, meaning any time a TermObjectConnection resolver is asked for, it will execute.
-	 */
-	public function should_execute() {
-		return true;
 	}
 
 	/**
@@ -234,16 +223,15 @@ class TermObjectConnectionResolver extends AbstractConnectionResolver {
 		 * This allows plugins/themes to hook in and alter what $args should be allowed to be passed
 		 * from a GraphQL Query to the get_terms query
 		 *
-		 * @param array       $query_args Array of mapped query args
-		 * @param array       $where_args Array of query "where" args
-		 * @param string      $taxonomy   The name of the taxonomy
-		 * @param mixed       $source     The query results
-		 * @param array       $all_args   All of the query arguments (not just the "where" args)
-		 * @param \WPGraphQL\AppContext $context The AppContext object
-		 * @param \GraphQL\Type\Definition\ResolveInfo $info The ResolveInfo object
+		 * @param array<string,mixed>                  $query_args Array of mapped query args
+		 * @param array<string,mixed>                  $where_args Array of query "where" args
+		 * @param string                               $taxonomy   The name of the taxonomy
+		 * @param mixed                                $source     The query results
+		 * @param array<string,mixed>                  $all_args   All of the query arguments (not just the "where" args)
+		 * @param \WPGraphQL\AppContext                $context   The AppContext object
+		 * @param \GraphQL\Type\Definition\ResolveInfo $info      The ResolveInfo object
 		 *
 		 * @since 0.0.5
-		 * @return array
 		 */
 		$query_args = apply_filters( 'graphql_map_input_fields_to_get_terms', $query_args, $where_args, $this->taxonomy, $this->source, $this->args, $this->context, $this->info );
 
@@ -254,7 +242,7 @@ class TermObjectConnectionResolver extends AbstractConnectionResolver {
 	 * {@inheritDoc}
 	 */
 	public function get_args(): array {
-		$args = $this->args;
+		$args = $this->get_unfiltered_args();
 
 		if ( ! empty( $args['where'] ) ) {
 			// Ensure all IDs are converted to database IDs.
@@ -287,16 +275,15 @@ class TermObjectConnectionResolver extends AbstractConnectionResolver {
 		}
 
 		/**
-		 *
 		 * Filters the GraphQL args before they are used in get_query_args().
 		 *
-		 * @param array                        $args                The GraphQL args passed to the resolver.
+		 * @param array<string,mixed>                                     $args                The GraphQL args passed to the resolver.
 		 * @param \WPGraphQL\Data\Connection\TermObjectConnectionResolver $connection_resolver Instance of the ConnectionResolver
-		 * @param array                        $unfiltered_args     Array of arguments input in the field as part of the GraphQL query.
+		 * @param array<string,mixed>                                     $unfiltered_args     Array of arguments input in the field as part of the GraphQL query.
 		 *
 		 * @since 1.11.0
 		 */
-		return apply_filters( 'graphql_term_object_connection_args', $args, $this, $this->args );
+		return apply_filters( 'graphql_term_object_connection_args', $args, $this, $this->get_unfiltered_args() );
 	}
 
 	/**
@@ -306,5 +293,14 @@ class TermObjectConnectionResolver extends AbstractConnectionResolver {
 	 */
 	public function is_valid_offset( $offset ) {
 		return get_term( absint( $offset ) ) instanceof \WP_Term;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * Default is true, meaning any time a TermObjectConnection resolver is asked for, it will execute.
+	 */
+	public function should_execute() {
+		return true;
 	}
 }
