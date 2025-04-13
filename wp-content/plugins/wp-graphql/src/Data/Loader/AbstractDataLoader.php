@@ -272,7 +272,7 @@ abstract class AbstractDataLoader {
 	private function generate_many( array $keys, array $result ) {
 		foreach ( $keys as $key ) {
 			$key = $this->key_to_scalar( $key );
-			yield isset( $result[ $key ] ) ? $this->get_model( $result[ $key ], $key ) : null;
+			yield isset( $result[ $key ] ) ? $this->normalize_entry( $result[ $key ], $key ) : null;
 		}
 	}
 
@@ -504,5 +504,5 @@ abstract class AbstractDataLoader {
 	 *
 	 * @return array<int|string,mixed>
 	 */
-	abstract protected function loadKeys( array $keys );
+	abstract protected function loadKeys( array $keys ); // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid -- @todo deprecate for `::load_keys()`
 }
