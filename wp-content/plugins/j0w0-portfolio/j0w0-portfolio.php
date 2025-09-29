@@ -53,6 +53,14 @@ function j0w0_register_graphql_types() {
                 return $url ? $url : null;
             },
         ],
+        'webDevelopmentContent' => [
+            'type'    => 'String',
+            'resolve' => function (WPGraphQL\Model\Post $post, $args, $context, $info) {
+                $content = get_post_meta($post->ID, 'web_development_content', true);
+
+                return $content ? apply_filters('the_content', $content) : null;
+            },
+        ],
     ]);
 
     // get attachment/media data for featured images
