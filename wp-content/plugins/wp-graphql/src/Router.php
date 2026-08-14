@@ -151,6 +151,8 @@ class Router {
 		 * default checks.
 		 *
 		 * @param ?bool $is_graphql_http_request Whether the request is a GraphQL HTTP Request. Default false.
+		 * @hookGroup request-lifecycle
+		 * @since 0.0.5
 		 */
 		$pre_is_graphql_http_request = apply_filters( 'graphql_pre_is_graphql_http_request', null );
 
@@ -201,6 +203,8 @@ class Router {
 		 * is a GraphQL request.
 		 *
 		 * @param bool $is_graphql_http_request Whether the request is a GraphQL HTTP Request. Default false.
+		 * @hookGroup request-lifecycle
+		 * @since 0.0.5
 		 */
 		return apply_filters( 'graphql_is_graphql_http_request', $is_graphql_http_request );
 	}
@@ -300,6 +304,8 @@ class Router {
 		 * Filtered list of access control headers.
 		 *
 		 * @param string[] $access_control_headers Array of headers to allow.
+		 * @hookGroup request-lifecycle
+		 * @since 0.0.5
 		 */
 		$access_control_allow_headers = apply_filters(
 			'graphql_access_control_allow_headers',
@@ -333,14 +339,28 @@ class Router {
 			$headers['X-hacker'] = __( 'If you\'re reading this, you should visit github.com/wp-graphql/wp-graphql and contribute!', 'wp-graphql' );
 		}
 
+		$request          = self::get_request();
+		$is_authenticated = $request instanceof Request
+			&& $request->app_context->viewer instanceof WP_User
+			&& $request->app_context->viewer->exists();
+		if ( ! $is_authenticated ) {
+			$is_authenticated = is_user_logged_in();
+		}
 		/**
-		 * Send nocache headers on authenticated requests.
+		 * Filters whether no-cache headers should be sent on the GraphQL HTTP response.
 		 *
-		 * @param bool $rest_send_nocache_headers Whether to send no-cache headers.
+		 * Prefer the current request's viewer when available (after execution) so we
+		 * send no-cache for the request that was actually authenticated, regardless
+		 * of global user timing. Fall back to is_user_logged_in() for paths that
+		 * run before the Request exists (e.g. 403 auth error, OPTIONS).
 		 *
+		 * @see https://github.com/wp-graphql/wp-graphql/issues/3340
+		 *
+		 * @param bool $send_no_cache_headers Whether to send no-cache headers.
+		 * @hookGroup request-lifecycle
 		 * @since 0.0.5
 		 */
-		$send_no_cache_headers = apply_filters( 'graphql_send_nocache_headers', is_user_logged_in() );
+		$send_no_cache_headers = apply_filters( 'graphql_send_nocache_headers', $is_authenticated );
 		if ( $send_no_cache_headers ) {
 			foreach ( wp_get_nocache_headers() as $no_cache_header_key => $no_cache_header_value ) {
 				$headers[ $no_cache_header_key ] = $no_cache_header_value;
@@ -351,6 +371,8 @@ class Router {
 		 * Filter the $headers to send
 		 *
 		 * @param array<string,string> $headers The headers to send
+		 * @hookGroup request-lifecycle
+		 * @since 0.0.5
 		 */
 		$headers = apply_filters( 'graphql_response_headers_to_send', $headers );
 
@@ -389,6 +411,8 @@ class Router {
 			 * Fire an action when the headers are set
 			 *
 			 * @param array<string,string> $headers The headers sent in the response
+			 * @hookGroup request-lifecycle
+			 * @since 0.0.5
 			 */
 			do_action( 'graphql_response_set_headers', $headers );
 		}
@@ -437,9 +461,52 @@ class Router {
 		}
 
 		/**
+		 * Validate authentication BEFORE any GraphQL hooks fire.
+		 *
+		 * This is critical for security - we must validate/downgrade authentication
+		 * before plugins can hook in and potentially expose sensitive information
+		 * based on the (not-yet-validated) authenticated user.
+		 *
+		 * For cookie-authenticated requests:
+		 * - No nonce: User is downgraded to guest
+		 * - Invalid nonce: Returns error response immediately
+		 * - Valid nonce: Proceeds normally
+		 *
+		 * @since 2.6.0
+		 */
+		$auth_error = self::validate_http_request_authentication();
+
+		if ( is_wp_error( $auth_error ) ) {
+			/**
+			 * Filter the HTTP status code returned for authentication errors.
+			 *
+			 * By default, invalid nonce errors return 403 Forbidden. Some clients
+			 * may expect 200 with a GraphQL error response instead.
+			 *
+			 * @since 2.6.0
+			 *
+			 * @param int       $status_code The HTTP status code. Default 403.
+			 * @param \WP_Error $auth_error  The authentication error.
+			 * @hookGroup authentication
+			 */
+			self::$http_status_code = apply_filters( 'graphql_authentication_error_status_code', 403, $auth_error );
+			self::set_headers();
+			wp_send_json(
+				[
+					'errors' => [
+						[
+							'message' => $auth_error->get_error_message(),
+						],
+					],
+				]
+			);
+		}
+
+		/**
 		 * This action can be hooked to to enable various debug tools,
 		 * such as enableValidation from the GraphQL Config.
 		 *
+		 * @hookGroup request-lifecycle
 		 * @since 0.0.4
 		 */
 		do_action( 'graphql_process_http_request' );
@@ -501,6 +568,8 @@ class Router {
 			 * @param SerializableError[] $errors  The errors array to be sent in the response.
 			 * @param \Throwable          $error   Thrown error object.
 			 * @param \WPGraphQL\Request  $request WPGraphQL Request object.
+			 * @hookGroup request-lifecycle
+			 * @since 0.0.4
 			 */
 			$response['errors'] = apply_filters(
 				'graphql_http_request_response_errors',
@@ -529,6 +598,7 @@ class Router {
 		 * @param ?array<string,mixed> $variables      Variables to passed to your GraphQL query
 		 * @param int|string           $status_code    The status code for the response
 		 *
+		 * @hookGroup request-lifecycle
 		 * @since 0.0.5
 		 */
 		do_action( 'graphql_process_http_request_response', $response, $response, $operation_name, $query, $variables, self::$http_status_code );
@@ -563,6 +633,8 @@ class Router {
 		 * @param string                                    $operation_name The operation name of the GraphQL Request
 		 * @param ?array<string,mixed>                      $variables      The variables applied to the GraphQL Request
 		 * @param ?\WP_User                                 $user           The current user object
+		 * @hookGroup request-lifecycle
+		 * @since 0.0.5
 		 */
 		self::$http_status_code = apply_filters( 'graphql_response_status_code', self::$http_status_code, $_deprecated, $response, $query, $operation_name, $variables, $user );
 
@@ -590,5 +662,127 @@ class Router {
 			'0.4.1'
 		);
 		return self::is_graphql_http_request();
+	}
+
+	/**
+	 * Validates HTTP request authentication BEFORE any GraphQL processing begins.
+	 *
+	 * This method provides CSRF protection for cookie-authenticated requests.
+	 * It runs before `graphql_process_http_request` and other hooks fire, ensuring
+	 * plugins cannot inadvertently expose sensitive data based on a user identity
+	 * that hasn't been validated yet.
+	 *
+	 * For cookie-authenticated requests:
+	 * - No nonce provided: User is downgraded to guest (CSRF protection)
+	 * - Invalid nonce: Returns WP_Error (caller should return error response)
+	 * - Valid nonce: Returns null (authentication preserved)
+	 *
+	 * @since 2.6.0
+	 *
+	 * @return \WP_Error|null WP_Error if invalid nonce, null otherwise.
+	 */
+	public static function validate_http_request_authentication(): ?\WP_Error {
+		/**
+		 * Only validate for logged-in users.
+		 * Guest users don't need validation - they're already unauthenticated.
+		 */
+		if ( ! is_user_logged_in() ) {
+			return null;
+		}
+
+		/**
+		 * Check if an Authorization header is present.
+		 * If so, this is likely a non-cookie auth method (JWT, Application Passwords, etc.)
+		 * which are inherently CSRF-safe and don't need nonce validation.
+		 */
+		$has_auth_header = ! empty( $_SERVER['HTTP_AUTHORIZATION'] )
+			|| ! empty( $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] );
+
+		if ( $has_auth_header ) {
+			return null;
+		}
+
+		/**
+		 * No Authorization header = cookie-based authentication.
+		 * Check for nonce in request param or header.
+		 */
+		$nonce = null;
+
+		if ( isset( $_REQUEST['_wpnonce'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$nonce = $_REQUEST['_wpnonce']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		} elseif ( isset( $_SERVER['HTTP_X_WP_NONCE'] ) ) {
+			$nonce = $_SERVER['HTTP_X_WP_NONCE']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		}
+
+		/**
+		 * Treat "falsy" nonce values as "no nonce provided".
+		 * This handles JavaScript serialization edge cases where null/undefined
+		 * get converted to strings.
+		 */
+		$empty_nonce_values = [ '', 'null', 'undefined', 'false', '0' ];
+		if ( in_array( $nonce, $empty_nonce_values, true ) ) {
+			$nonce = null;
+		}
+
+		/**
+		 * Filter whether to require a nonce for cookie-based authentication.
+		 *
+		 * By default, WPGraphQL requires a nonce (X-WP-Nonce header or _wpnonce parameter)
+		 * for cookie-authenticated requests to prevent CSRF attacks.
+		 *
+		 * @since 2.5.4
+		 *
+		 * @param bool $require_nonce Whether to require a nonce for cookie auth. Default true.
+		 * @param null $request       The Request instance (null in Router context).
+		 * @hookGroup authentication
+		 */
+		$require_nonce = apply_filters( 'graphql_cookie_auth_require_nonce', true, null );
+
+		/**
+		 * If nonce is not required, allow the authenticated request.
+		 */
+		if ( ! $require_nonce ) {
+			return null;
+		}
+
+		/**
+		 * No nonce provided - downgrade to guest (unless plugin prevents it).
+		 */
+		if ( null === $nonce ) {
+			/**
+			 * Allow plugins to prevent the downgrade via the graphql_authentication_errors filter.
+			 *
+			 * @param bool|null                $authentication_errors Null to allow default behavior, false to preserve auth.
+			 * @param \WPGraphQL\Request|null  $request               The Request instance (null in Router context).
+		 * @hookGroup authentication
+		 * @since 0.0.5
+			 */
+			$filtered = apply_filters( 'graphql_authentication_errors', null, self::get_request() );
+
+			// If a plugin explicitly returned false (no errors), preserve authentication
+			if ( false === $filtered ) {
+				return null;
+			}
+
+			// Downgrade to guest
+			wp_set_current_user( 0 );
+			return null;
+		}
+
+		/**
+		 * Nonce provided - validate it.
+		 * Support both 'wp_graphql' and 'wp_rest' for backward compatibility.
+		 */
+		$nonce_valid = wp_verify_nonce( $nonce, 'wp_graphql' ) || wp_verify_nonce( $nonce, 'wp_rest' );
+
+		if ( ! $nonce_valid ) {
+			return new \WP_Error(
+				'graphql_cookie_invalid_nonce',
+				__( 'Cookie nonce is invalid', 'wp-graphql' ),
+				[ 'status' => 403 ]
+			);
+		}
+
+		return null;
 	}
 }

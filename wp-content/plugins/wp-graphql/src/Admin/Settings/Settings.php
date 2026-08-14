@@ -32,8 +32,26 @@ class Settings {
 
 		add_action( 'admin_menu', [ $this, 'add_options_page' ] );
 		add_action( 'init', [ $this, 'register_settings' ] );
+
+		// Initialize the registry on every request (priority 11 — after
+		// register_settings runs at priority 10) so registered settings are
+		// available in non-admin contexts such as the /graphql endpoint.
+		add_action( 'init', [ $this, 'init_registry' ], 11 );
+
 		add_action( 'admin_init', [ $this, 'initialize_settings_page' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'initialize_settings_page_scripts' ] );
+	}
+
+	/**
+	 * Fire the settings registry initialization (registration-only work).
+	 *
+	 * Admin UI scaffolding (add_settings_section / add_settings_field) still
+	 * runs from `initialize_settings_page` on `admin_init`.
+	 *
+	 * @return void
+	 */
+	public function init_registry() {
+		$this->settings_api->init_registry();
 	}
 
 	/**
@@ -91,6 +109,13 @@ class Settings {
 			]
 		);
 
+		/**
+		 * Filter the configured endpoint path for WPGraphQL.
+		 *
+		 * @param ?string $endpoint A custom endpoint path.
+		 * @hookGroup settings
+		 * @since 0.0.6
+		 */
 		$custom_endpoint = apply_filters( 'graphql_endpoint', null );
 		$this->settings_api->register_field(
 			'graphql_general_settings',
@@ -108,6 +133,8 @@ class Settings {
 				'default'           => ! empty( $custom_endpoint ) ? $custom_endpoint : 'graphql',
 				'disabled'          => ! empty( $custom_endpoint ),
 				'sanitize_callback' => static function ( $value ) {
+					$value = sanitize_text_field( wp_unslash( $value ) );
+
 					if ( empty( $value ) ) {
 						add_settings_error( 'graphql_endpoint', 'required', __( 'The "GraphQL Endpoint" field is required and cannot be blank. The default endpoint is "graphql"', 'wp-graphql' ), 'error' );
 
@@ -137,11 +164,18 @@ class Settings {
 					'default' => 'on',
 				],
 				[
-					'name'    => 'batch_limit',
-					'label'   => __( 'Batch Query Limit', 'wp-graphql' ),
-					'desc'    => __( 'If Batch Queries are enabled, this value sets the max number of batch operations to allow per request. Requests containing more batch operations than allowed will be rejected before execution.', 'wp-graphql' ),
-					'type'    => 'number',
-					'default' => 10,
+					'name'              => 'batch_limit',
+					'label'             => __( 'Batch Query Limit', 'wp-graphql' ),
+					'desc'              => __( 'If Batch Queries are enabled, this value sets the max number of batch operations to allow per request. Requests containing more batch operations than allowed will be rejected before execution.', 'wp-graphql' ),
+					'type'              => 'number',
+					'default'           => 10,
+					'sanitize_callback' => static function ( $value ) {
+						// If the entered value is not a positive integer, default to 10
+						if ( ! absint( $value ) ) {
+							$value = 10;
+						}
+						return absint( $value );
+					},
 				],
 				[
 					'name'    => 'query_depth_enabled',
@@ -217,11 +251,27 @@ class Settings {
 					'default' => 'off',
 				],
 				[
-					'name'    => 'tracing_user_role',
-					'label'   => __( 'Tracing Role', 'wp-graphql' ),
-					'desc'    => __( 'If Tracing is enabled, this limits it to requests from users with the specified User Role.', 'wp-graphql' ),
-					'type'    => 'user_role_select',
-					'default' => 'administrator',
+					'name'              => 'tracing_user_role',
+					'label'             => __( 'Tracing Role', 'wp-graphql' ),
+					'desc'              => __( 'If Tracing is enabled, this limits it to requests from users with the specified User Role.', 'wp-graphql' ),
+					'type'              => 'user_role_select',
+					'default'           => 'administrator',
+					'sanitize_callback' => static function ( $value ) {
+						$value = sanitize_text_field( $value );
+
+						// 'any' is a special valid value
+						if ( 'any' === $value ) {
+							return $value;
+						}
+
+						// Validate against actual WordPress roles
+						$roles = wp_roles()->get_names();
+						if ( ! array_key_exists( $value, $roles ) ) {
+							return 'administrator';
+						}
+
+						return $value;
+					},
 				],
 				[
 					'name'    => 'query_logs_enabled',
@@ -231,11 +281,27 @@ class Settings {
 					'default' => 'off',
 				],
 				[
-					'name'    => 'query_log_user_role',
-					'label'   => __( 'Query Log Role', 'wp-graphql' ),
-					'desc'    => __( 'If Query Logs are enabled, this limits them to requests from users with the specified User Role.', 'wp-graphql' ),
-					'type'    => 'user_role_select',
-					'default' => 'administrator',
+					'name'              => 'query_log_user_role',
+					'label'             => __( 'Query Log Role', 'wp-graphql' ),
+					'desc'              => __( 'If Query Logs are enabled, this limits them to requests from users with the specified User Role.', 'wp-graphql' ),
+					'type'              => 'user_role_select',
+					'default'           => 'administrator',
+					'sanitize_callback' => static function ( $value ) {
+						$value = sanitize_text_field( $value );
+
+						// 'any' is a special valid value
+						if ( 'any' === $value ) {
+							return $value;
+						}
+
+						// Validate against actual WordPress roles
+						$roles = wp_roles()->get_names();
+						if ( ! array_key_exists( $value, $roles ) ) {
+							return 'administrator';
+						}
+
+						return $value;
+					},
 				],
 				[
 					'name'     => 'public_introspection_enabled',
@@ -253,7 +319,13 @@ class Settings {
 			]
 		);
 
-		// Action to hook into to register settings
+		/**
+		 * Fires after core WPGraphQL settings have been registered.
+		 *
+		 * @param self $settings Settings manager instance.
+		 * @hookGroup settings
+		 * @since 0.13.0
+		 */
 		do_action( 'graphql_register_settings', $this );
 	}
 

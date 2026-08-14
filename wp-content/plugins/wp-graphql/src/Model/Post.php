@@ -308,8 +308,12 @@ class Post extends Model {
 		}
 
 		/**
-		 * Media Items (attachments) are all public. Once uploaded to the media library
-		 * they are exposed with a public URL on the site.
+		 * Media Items (attachments) with "inherit" status should inherit their privacy
+		 * from their parent post. If the parent is draft/pending/private, the attachment
+		 * should also be considered private.
+		 *
+		 * Attachments without a parent or with a published parent are public. Once uploaded
+		 * to the media library they are exposed with a public URL on the site.
 		 *
 		 * The WP REST API sets media items to private if they don't have a `post_parent` set, but
 		 * this has broken production apps, because media items can be uploaded directly to the
@@ -317,10 +321,46 @@ class Post extends Model {
 		 * within a Gutenberg block, etc, but then a consumer tries to ask for data of a published
 		 * image and REST returns nothing because the media item is treated as private.
 		 *
-		 * Currently, we're treating all media items as public because there's nothing explicit in
-		 * how WP Core handles privacy of media library items. By default they're publicly exposed.
+		 * For attachments with "inherit" status, we check the parent's privacy status.
+		 * For other attachments, they are treated as public.
+		 *
+		 * To override this behavior and make all media items public (regardless of parent status),
+		 * use the `graphql_pre_model_data_is_private` filter:
+		 *
+		 * @example
+		 * ```php
+		 * add_filter( 'graphql_pre_model_data_is_private', function( $is_private, $model_name, $data ) {
+		 *     // Make all media items public
+		 *     if ( 'PostObject' === $model_name && isset( $data->post_type ) && 'attachment' === $data->post_type ) {
+		 *         return false; // false = not private (public)
+		 *     }
+		 *     return $is_private; // Return null to use default logic for other types
+		 * }, 10, 3 );
+		 * ```
 		 */
 		if ( 'attachment' === $this->data->post_type ) {
+			// If the attachment has "inherit" status and a parent post, check the parent's privacy
+			// This ensures attachments inherit visibility from their parent (e.g., draft post = private attachment)
+			if ( 'inherit' === $this->data->post_status && ! empty( $this->data->post_parent ) ) {
+				$parent_post = get_post( (int) $this->data->post_parent );
+
+				// If parent doesn't exist (e.g., was deleted), treat as public
+				// This aligns with the documented reasoning: attachments without parents are public
+				// because they may be used in published content, featured images, etc.
+				if ( ! $parent_post instanceof WP_Post ) {
+					return false;
+				}
+
+				// Check if the parent post would be private
+				// Create a temporary Post model to check the parent's privacy
+				// This properly initializes the parent's post type object and checks its privacy status
+				$parent_model = new self( $parent_post );
+				return $parent_model->is_private();
+			}
+
+			// Attachments without inherit status or without a parent are public
+			// This preserves the documented behavior: media items uploaded directly to the library
+			// or used in published content should be publicly accessible
 			return false;
 		}
 
@@ -352,11 +392,35 @@ class Post extends Model {
 			$post_object = $this->data;
 		}
 
+		$status        = $this->data->post_status;
+		$status_object = get_post_status_object( $status );
+
 		/**
-		 * If the status is NOT publish and the user does NOT have capabilities to edit posts,
-		 * consider the post private.
+		 * A status whose `public` flag is true is visible to everyone, the same way it is on the
+		 * WordPress front-end and the REST API (e.g. `publish` and custom statuses registered with
+		 * `'public' => true`). Revisions are excluded here, their access is determined relative to
+		 * the parent post below.
 		 */
-		if ( ! isset( $post_type_object->cap->edit_posts ) || ! current_user_can( $post_type_object->cap->edit_posts ) ) {
+		if (
+			'revision' !== $this->data->post_type &&
+			$status_object instanceof \stdClass &&
+			true === $status_object->public &&
+			( true === $post_type_object->public || true === $post_type_object->publicly_queryable )
+		) {
+			return false;
+		}
+
+		/**
+		 * Otherwise the post is private unless the user has the capability required for its status:
+		 * `read_private_posts` for the `private` status, and `edit_posts` for every other non-public
+		 * status (draft, pending, future, trash, and custom non-public statuses). This lets users who
+		 * can read private posts see them even without edit capabilities.
+		 */
+		$required_cap = 'private' === $status
+			? ( isset( $post_type_object->cap->read_private_posts ) ? $post_type_object->cap->read_private_posts : 'read_private_posts' )
+			: ( isset( $post_type_object->cap->edit_posts ) ? $post_type_object->cap->edit_posts : 'edit_posts' );
+
+		if ( ! current_user_can( $required_cap ) ) {
 			return true;
 		}
 
@@ -373,10 +437,6 @@ class Post extends Model {
 		 */
 
 		if ( empty( $post_type_object->name ) || ! in_array( $post_type_object->name, \WPGraphQL::get_allowed_post_types(), true ) ) {
-			return true;
-		}
-
-		if ( 'private' === $this->data->post_status && ( ! isset( $post_type_object->cap->read_private_posts ) || ! current_user_can( $post_type_object->cap->read_private_posts ) ) ) {
 			return true;
 		}
 
@@ -454,7 +514,6 @@ class Post extends Model {
 				},
 				'editLock'                  => function () {
 					if ( ! function_exists( 'wp_check_post_lock' ) ) {
-						// @phpstan-ignore requireOnce.fileNotFound
 						require_once ABSPATH . 'wp-admin/includes/post.php';
 					}
 

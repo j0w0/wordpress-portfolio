@@ -83,6 +83,7 @@ final class WPGraphQL {
 			self::$instance->filters();
 			self::$instance->upgrade();
 			self::$instance->deprecated();
+			self::$instance->commands();
 		}
 
 		/**
@@ -122,6 +123,14 @@ final class WPGraphQL {
 	 */
 	private function setup_constants(): void {
 		graphql_setup_constants();
+	}
+
+	/**
+	 * Setup Experiments.
+	 */
+	public function setup_experiments(): void {
+		$experimental = new \WPGraphQL\Experimental\Experimental();
+		$experimental->init();
 	}
 
 	/**
@@ -191,10 +200,15 @@ final class WPGraphQL {
 				 * Fire off init action
 				 *
 				 * @param \WPGraphQL $instance The instance of the WPGraphQL class
+				 * @hookGroup request-lifecycle
+				 * @since 1.1.5
 				 */
 				do_action( 'graphql_init', $instance );
 			}
 		);
+
+		// Load plugin textdomain for translations
+		add_action( 'init', [ self::class, 'load_textdomain' ], 0 );
 
 		// Initialize the plugin url constant
 		// see: https://developer.wordpress.org/reference/functions/plugins_url/#more-information
@@ -230,6 +244,7 @@ final class WPGraphQL {
 
 		// Initialize Admin functionality
 		add_action( 'after_setup_theme', [ $this, 'init_admin' ] );
+		add_action( 'after_setup_theme', [ $this, 'setup_experiments' ] );
 
 		add_action(
 			'init_graphql_request',
@@ -244,6 +259,32 @@ final class WPGraphQL {
 
 		// Initialize Update functionality.
 		( new \WPGraphQL\Admin\Updates\Updates() )->init();
+	}
+
+	/**
+	 * Registers WP-CLI commands.
+	 *
+	 * @since 2.7.0
+	 */
+	private function commands(): void {
+		if ( ! class_exists( 'WP_CLI' ) || ! defined( 'WP_CLI' ) || ! WP_CLI ) {
+			return;
+		}
+
+		// Ensure the Commands class is loaded before trying to register it
+		// If the class doesn't exist, try to require the file directly
+		// (in case the autoloader hasn't loaded it yet)
+		if ( ! class_exists( \WPGraphQL\CLI\Commands::class ) ) {
+			// phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingVariable -- WPGRAPHQL_PLUGIN_DIR is a constant, not user input
+			if ( file_exists( WPGRAPHQL_PLUGIN_DIR . 'src/CLI/Commands.php' ) ) {
+				require_once WPGRAPHQL_PLUGIN_DIR . 'src/CLI/Commands.php';
+			}
+		}
+
+		// Only register if the class exists after attempting to load it
+		if ( class_exists( \WPGraphQL\CLI\Commands::class ) ) {
+			\WP_CLI::add_command( 'graphql', \WPGraphQL\CLI\Commands::class );
+		}
 	}
 
 	/**
@@ -315,6 +356,19 @@ final class WPGraphQL {
 	}
 
 	/**
+	 * Load the plugin textdomain for translations.
+	 *
+	 * @since 2.7.0
+	 */
+	public static function load_textdomain(): void {
+		load_plugin_textdomain(
+			'wp-graphql',
+			false,
+			dirname( plugin_basename( WPGRAPHQL_PLUGIN_FILE ) ) . '/languages/'
+		);
+	}
+
+	/**
 	 * Determine the post_types and taxonomies, etc that should show in GraphQL.
 	 */
 	public function setup_types(): void {
@@ -373,7 +427,7 @@ final class WPGraphQL {
 		 */
 		add_filter(
 			'wpml_is_redirected',
-			static function ( bool $is_redirect ) {
+			static function ( $is_redirect ) {
 				if ( is_graphql_request() ) {
 					return false;
 				}
@@ -442,6 +496,8 @@ final class WPGraphQL {
 			 *
 			 * @param string $stored_version The version number currently stored in the database.
 			 * @param string $new_version    The version number of the current plugin.
+			 * @hookGroup settings
+			 * @since 1.2.3
 			 */
 			do_action( 'graphql_do_update_routine', $stored_version, WPGRAPHQL_VERSION );
 		}
@@ -566,6 +622,8 @@ final class WPGraphQL {
 		 *
 		 * @param array<string,mixed> $args           The graphql specific args for the post type
 		 * @param string              $post_type_name The name of the post type being registered
+		 * @hookGroup schema-registration
+		 * @since 1.12.0
 		 */
 		$graphql_args = apply_filters( 'register_graphql_post_type_args', $graphql_args, $post_type_name );
 
@@ -595,6 +653,8 @@ final class WPGraphQL {
 		 *
 		 * @param array<string,mixed> $args          The graphql specific args for the taxonomy
 		 * @param string              $taxonomy_name The name of the taxonomy being registered
+		 * @hookGroup schema-registration
+		 * @since 1.12.0
 		 */
 		$graphql_args = apply_filters( 'register_graphql_taxonomy_args', $graphql_args, $taxonomy_name );
 
@@ -684,6 +744,7 @@ final class WPGraphQL {
 			 *
 			 * @since 1.8.1 add $post_type_objects parameter.
 			 * @since 0.0.2
+			 * @hookGroup schema-registration
 			 */
 			$allowed_post_type_names = apply_filters( 'graphql_post_entities_allowed_post_types', $post_type_names, $post_type_objects );
 
@@ -769,6 +830,7 @@ final class WPGraphQL {
 			 *
 			 * @since 1.8.1 add $tax_names and $tax_objects parameters.
 			 * @since 0.0.2
+			 * @hookGroup schema-registration
 			 */
 			$allowed_tax_names = apply_filters( 'graphql_term_entities_allowed_taxonomies', $tax_names, $tax_objects );
 
@@ -846,13 +908,18 @@ final class WPGraphQL {
 			 * @param \WPGraphQL\AppContext $app_context Object The AppContext object containing all of the
 			 * information about the context we know at this point
 			 *
-			 * @since 0.0.5
+			 * @hookGroup schema-registration
+			 * @since 0.0.16
 			 */
 			self::$schema = apply_filters( 'graphql_schema', $schema, self::get_app_context() );
 		}
 
 		/**
 		 * Fire an action when the Schema is returned
+		 *
+		 * @param \WPGraphQL\WPSchema $schema The executable schema.
+		 * @hookGroup schema-registration
+		 * @since 1.1.5
 		 */
 		do_action( 'graphql_get_schema', self::$schema );
 
@@ -874,7 +941,11 @@ final class WPGraphQL {
 		}
 
 		/**
+		 * Filters whether GraphQL debug mode is enabled.
+		 *
 		 * @param bool $enabled Whether GraphQL Debug is enabled or not
+		 * @hookGroup debugging
+		 * @since 1.1.5
 		 */
 		return (bool) apply_filters( 'graphql_debug_enabled', $enabled );
 	}
@@ -897,6 +968,7 @@ final class WPGraphQL {
 			 * @param \WPGraphQL\AppContext $app_context Object The AppContext object containing all of the
 			 * information about the context we know at this point
 			 *
+			 * @hookGroup schema-registration
 			 * @since 0.0.5
 			 */
 			self::$type_registry = apply_filters( 'graphql_type_registry', $type_registry, self::get_app_context() );
@@ -904,6 +976,10 @@ final class WPGraphQL {
 
 		/**
 		 * Fire an action when the Type Registry is returned
+		 *
+		 * @param \WPGraphQL\Registry\TypeRegistry $type_registry The GraphQL type registry.
+		 * @hookGroup schema-registration
+		 * @since 1.1.5
 		 */
 		do_action( 'graphql_get_type_registry', self::$type_registry );
 
@@ -923,7 +999,7 @@ final class WPGraphQL {
 			return null;
 		}
 
-		$schema = file_get_contents( WPGRAPHQL_PLUGIN_DIR . 'schema.graphql' );
+		$schema = file_get_contents( WPGRAPHQL_PLUGIN_DIR . 'schema.graphql' ); // phpcs:ignore WordPressVIPMinimum.Performance.FetchingRemoteData.FileGetContentsUnknown -- reads a bundled plugin file, not a remote URL
 
 		return ! empty( $schema ) ? $schema : null;
 	}
